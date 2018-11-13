@@ -30,12 +30,12 @@ Re-examination: *Monday 25th of February*, 19:00–22:00
 Fork the [sle-rug](https://github.com/cwi-swat/sle-rug) repository, import the Eclipse project in the root directory, and see the provided modules in `src` for detailed instructions for the exercises from week 2 on. 
 
 - Week 1: Install the *unstable* [Rascal Eclipse Plugin](https://www.rascal-mpl.org/start/), do the [Hack your Javascript](https://github.com/cwi-swat/hack-your-javascript) tutorial.
-- Week 2: Concrete syntax of QL using Rascal's grammar formalism
-- Week 3: Abstract syntax and name analysis of QL
-- Week 4: Type checker for QL
-- Week 5: Interpreter for QL
-- Week 6: Code generator compiling QL to executable HTML and Javascript 
-- Week 7: Normalization of QL and rename refactoring
+- Week 2: Concrete syntax of QL using Rascal's grammar formalism (module `Syntax`)
+- Week 3: Abstract syntax and name analysis of QL (modules `AST` and `Resolve`)
+- Week 4: Type checker for QL (module `Check`)
+- Week 5: Interpreter for QL (module `Eval`)
+- Week 6: Code generator compiling QL to executable HTML and Javascript (module `Compile`)
+- Week 7: Normalization of QL and rename refactoring (module `Transform`)
 - Week 8: Grading of lab starts
 
 
