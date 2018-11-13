@@ -1,5 +1,8 @@
 ## Software Language Engineering
 
+Software Language Engineering (SLE) is concerned with the principled techniques and concepts for the construction of software languages. Software languages come in many shapes and sizes, including programming languages, modeling languages, data format languages, specification languages etc. In this course you will get acquainted with the basic techniques and concepts of language engineering, and acquire the basic skills to define the syntax and semantics of software languages, as well as know the relevant tools and techniques for implementing various kinds of language processors. The course consists of a series of lectures based on the book on SLE by Ralf Lämmel. During the course you  will develop a simple domain-specific language (DSL) using the metaprogramming language Rascal, exercising both foundational and practical aspects of SLE. The final exam will test individual knowledge regarding the key concepts of SLE.
+
+
 ### General information
 
 Contact: Tijs van der storm [storm@cwi.nl](mailto:storm@cwi.nl)
