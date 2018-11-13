@@ -8,9 +8,7 @@ This page: [https://cwi-swat.github.io/sle-rug/](https://cwi-swat.github.io/sle-
 
 ### Syllabus
 
-Book: *Software Languages: Syntax, Semantics, and Metaprogramming*, by Ralf L&auml;mmel
-
-For sale here: [Springer](https://www.springer.com/gp/book/9783319907987), [Amazon](https://www.amazon.de/Software-Languages-Syntax-Semantics-Metaprogramming/dp/3319907980)
+Book: *Software Languages: Syntax, Semantics, and Metaprogramming*, by Ralf L&auml;mmel. The book is for sale here: [Springer](https://www.springer.com/gp/book/9783319907987), [Amazon](https://www.amazon.de/Software-Languages-Syntax-Semantics-Metaprogramming/dp/3319907980)
 
 Detailed schedule: [rooster.rug.nl](http://rooster.rug.nl/?LayoutMode=Wide&nestorcode=WBCS18001.2018-2019)
 
@@ -23,7 +21,9 @@ Detailed schedule: [rooster.rug.nl](http://rooster.rug.nl/?LayoutMode=Wide&nesto
 - Week 7: Transformation (Chapters 5 & 12)
 - Week 8: Wrap up & grading of lab starts
 
-Exam: *Friday 25th of January*
+Exam: *Friday 25th of January*, 14:00-17:00
+
+Re-examination: *Monday 25th of February*, 19:00–22:00
 
 ### Lab
 
