@@ -17,18 +17,18 @@ alias TEnv = rel[loc def, str name, str label, Type \type];
 // To avoid recursively traversing the form, use the `visit` construct
 // or deep match (e.g., `for (/question(...) := f) {...}` ) 
 TEnv collect(AForm f) {
-  return {}; // TODO
+  return {}; 
 }
 
 set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
-  return {}; // TODO
+  return {}; 
 }
 
 // - produce an error if there are declared questions with the same name but different types.
 // - duplicate labels should trigger a warning 
 // - the declared type computed questions should match the type of the expression.
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
-  return {}; // TODO
+  return {}; 
 }
 
 // Check operand compatibility with operators.
@@ -53,9 +53,9 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
       if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
         return t;
       }
-  
+    // etc.
   }
-  return tunknown(); // TODO
+  return tunknown(); 
 }
 
 /* 

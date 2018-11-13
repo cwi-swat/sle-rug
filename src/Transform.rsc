@@ -22,7 +22,7 @@ import AST;
  */
  
 AForm flatten(AForm f) {
-  return f; // TODO
+  return f; 
 }
 
 /* Rename refactoring:
@@ -34,7 +34,7 @@ AForm flatten(AForm f) {
  */
  
  AForm rename(AForm f, loc useOrDef, str newName, UseDef useDef) {
-   return f; // TODO
+   return f; 
  } 
  
  

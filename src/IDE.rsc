@@ -1,22 +1,23 @@
 module IDE
 
-import QL;
+import Syntax;
 import AST;
 import CST2AST;
 import Resolve;
 import Check;
 import Compile;
 
+import util::IDE;
 import Message;
 import ParseTree;
 
 
-private str TQL ="Tutorial QL";
+private str MyQL ="MyQL";
 
 anno rel[loc, loc] Tree@hyperlinks;
 
 void main() {
-  registerLanguage(TQL, "tql", Tree(str src, loc l) {
+  registerLanguage(MyQL, "myql", Tree(str src, loc l) {
     return parse(#start[Form], src, l);
   });
   
@@ -28,7 +29,7 @@ void main() {
         set[Message] msgs = check(ast, collect(ast), useDef);
         return t[@messages=msgs][@hyperlinks=useDef];
       }
-      return t[@message={error("Not a form", t@\loc)}];
+      return t[@messages={error("Not a form", t@\loc)}];
     }),
     
     builder(set[Message] (Tree t) {
@@ -45,5 +46,5 @@ void main() {
     })
   };
   
-  registerContributions(TQL, contribs);
+  registerContributions(MyQL, contribs);
 }

@@ -2,6 +2,7 @@ module CST2AST
 
 import Syntax;
 import AST;
+
 import ParseTree;
 import String;
 
@@ -16,20 +17,24 @@ import String;
  */
 
 AForm cst2ast(start[Form] sf) {
-  Form f = sf.top;
-  return form("", []); // TODO
+  Form f = sf.top; // remove layout before and after form
+  return form("", [], src=f@\loc); 
 }
 
 AQuestion cst2ast(Question q) {
-  // TODO
+  throw "Not yet implemented";
 }
 
 AExpr cst2ast(Expr e) {
   switch (e) {
     case (Expr)`<Id x>`: return ref("<x>", src=x@\loc);
     
-    // ...
+    // etc.
     
     default: throw "Unhandled expression: <e>";
   }
+}
+
+AType cst2ast(Type t) {
+  throw "Not yet implemented";
 }

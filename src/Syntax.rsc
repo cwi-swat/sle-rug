@@ -7,23 +7,30 @@ extend lang::std::Id;
  * Concrete syntax of QL
  */
 
-start syntax Form = ; // TODO
+start syntax Form 
+  = "form" Id "{" Question* "}"; 
 
 // TODO: question, computed question, block, if-then-else, if-then
-syntax Question = ; 
+syntax Question
+  = 
+  ; 
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
 // and use C/Java style precedence rules (look it up on the internet)
 syntax Expr 
-  = ref: Id name
-  ; 
+  = Id \ "true" \ "false" // true/false are reserved keywords.
+  ;
   
-lexical Str = ; // TODO
+syntax Type
+  = ;  
+  
+lexical Str = ;
 
-lexical Int = ; // TODO
+lexical Int 
+  = ;
 
-lexical Bool = ; // TODO
+lexical Bool = ;
 
 
 

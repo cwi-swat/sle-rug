@@ -40,19 +40,20 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
 }
 
 VEnv evalOnce(AForm f, Input inp, VEnv venv) {
-  return (); // TODO: evaluate each question
+  return (); 
 }
 
 VEnv eval(AQuestion q, Input inp, VEnv venv) {
   // evaluate conditions for branching,
   // evaluate inp and computed questions to return updated VEnv
-  return (); // TODO
+  return (); 
 }
 
 Value eval(AExpr e, VEnv venv) {
   switch (e) {
     case ref(str x): return venv[x];
-    // etc
+    
+    // etc.
     
     default: throw "Unsupported expression <e>";
   }

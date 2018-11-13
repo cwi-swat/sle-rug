@@ -7,13 +7,15 @@ module AST
  * - make sure there is an almost one-to-one correspondence with the grammar
  */
 
-data AForm(loc src = |unknown://|)
+data AForm(loc src = |tmp:///|)
   = form(str name, list[AQuestion] questions)
   ; 
 
-data AQuestion(loc src = |unknown://|);
+data AQuestion(loc src = |tmp:///|)
+  ; 
 
-data AExpr(loc src = |unknown://|)
-  = ref(str name);
+data AExpr(loc src = |tmp:///|)
+  = ref(str name)
+  ;
 
-
+data AType(loc src = |tmp:///|);
