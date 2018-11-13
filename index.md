@@ -31,7 +31,7 @@ Fork the [sle-rug](https://github.com/cwi-swat/sle-rug) repository, import the E
 
 - Week 1: Install the *unstable* [Rascal Eclipse Plugin](https://www.rascal-mpl.org/start/), do the [Hack your Javascript](https://github.com/cwi-swat/hack-your-javascript) tutorial.
 - Week 2: Concrete syntax of QL using Rascal's grammar formalism (module `Syntax`)
-- Week 3: Abstract syntax and name analysis of QL (modules `AST` and `Resolve`)
+- Week 3: Abstract syntax and name analysis of QL (modules `AST`, `CST2AST` and `Resolve`)
 - Week 4: Type checker for QL (module `Check`)
 - Week 5: Interpreter for QL (module `Eval`)
 - Week 6: Code generator compiling QL to executable HTML and Javascript (module `Compile`)
