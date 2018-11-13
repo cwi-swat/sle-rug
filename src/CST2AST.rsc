@@ -15,7 +15,8 @@ import String;
  * - See the ref example on how to obtain and propagate source locations.
  */
 
-AForm cst2ast(start[Form] f) {
+AForm cst2ast(start[Form] sf) {
+  Form f = sf.top;
   return form("", []); // TODO
 }
 
