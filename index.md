@@ -11,7 +11,7 @@ This page: [https://cwi-swat.github.io/sle-rug/](https://cwi-swat.github.io/sle-
 
 ### Syllabus
 
-Book: *Software Languages: Syntax, Semantics, and Metaprogramming*, by Ralf L&auml;mmel. The book is for sale here: [Springer](https://www.springer.com/gp/book/9783319907987), [Amazon](https://www.amazon.de/Software-Languages-Syntax-Semantics-Metaprogramming/dp/3319907980)
+Book: *Software Languages: Syntax, Semantics, and Metaprogramming*, by Ralf L&auml;mmel. The book is for sale here: [Springer](https://www.springer.com/gp/book/9783319907987), [Amazon](https://www.amazon.de/Software-Languages-Syntax-Semantics-Metaprogramming/dp/3319907980) *FREE E-book*: [https://rug.on.worldcat.org/oclc/1036771828](https://rug.on.worldcat.org/oclc/1036771828).
 
 Detailed schedule: [rooster.rug.nl](http://rooster.rug.nl/?LayoutMode=Wide&nestorcode=WBCS18001.2018-2019)
 
