@@ -5,7 +5,7 @@ Software Language Engineering (SLE) is concerned with the principled techniques 
 
 ### General information
 
-Contact: Tijs van der storm [storm@cwi.nl](mailto:storm@cwi.nl)
+Contact: Tijs van der Storm [storm@cwi.nl](mailto:storm@cwi.nl)
 
 This page: [https://cwi-swat.github.io/sle-rug/](https://cwi-swat.github.io/sle-rug/)
 
