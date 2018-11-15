@@ -34,7 +34,7 @@ Fork the [sle-rug](https://github.com/cwi-swat/sle-rug) repository, import the E
 
 Notes about hack your javascript:
 
-- If you get the error "annotation Hyperlinks has been declared before...", remove ",str" from `rel[loc, loc, str]`, and remove ", x" from `<u, d, x>` where you find it.
+- If you get the error "annotation Hyperlinks has been declared before...", remove ",str" from `rel[loc, loc, str]`, and remove ", x" from `<u, d, x>` where you find it in the module `javascript::Plugin`.
 
 - Start console and do `import javascript::Plugin;` and then `main()`.
 
