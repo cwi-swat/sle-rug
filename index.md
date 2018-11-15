@@ -32,6 +32,15 @@ Re-examination: *Monday 25th of February*, 19:00–22:00
 
 Fork the [sle-rug](https://github.com/cwi-swat/sle-rug) repository, import the Eclipse project in the root directory, and see the provided modules in `src` for detailed instructions for the exercises from week 2 on. 
 
+Notes about hack your javascript:
+
+- If you get the error "annotation Hyperlinks has been declared before...", remove ",str" from `rel[loc, loc, str]`, and remove ", x" from `<u, d, x>` where you find it.
+
+- Start console and do `import javascript::Plugin;` and then `main()`.
+
+NB: the transformations are run after *saving* an SJS file. Open the associated HTML files to see the result.
+
+
 - Week 1: Install the *unstable* [Rascal Eclipse Plugin](https://www.rascal-mpl.org/start/); so use the following update URL [https://update.rascal-mpl.org/unstable/](https://update.rascal-mpl.org/unstable/). Do the [Hack your Javascript](https://github.com/cwi-swat/hack-your-javascript) tutorial.
 - Week 2: Concrete syntax of QL using Rascal's grammar formalism (module `Syntax`)
 - Week 3: Abstract syntax and name analysis of QL (modules `AST`, `CST2AST` and `Resolve`)
