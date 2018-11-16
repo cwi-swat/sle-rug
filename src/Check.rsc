@@ -44,7 +44,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
     // etc.
   }
   
-  return msg; 
+  return msgs; 
 }
 
 Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
