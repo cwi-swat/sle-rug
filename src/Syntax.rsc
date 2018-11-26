@@ -45,7 +45,7 @@ syntax Expr
 syntax Type
   = "boolean" | "integer";
   
-lexical Str = ^"\"" ![\"]* "\""$;
+lexical Str = "\"" ![\"]* "\"";
 
 lexical Int 
   = [1-9] [0-9]*;
