@@ -22,7 +22,18 @@ AForm cst2ast(start[Form] sf) {
 }
 
 AQuestion cst2ast(Question q) {
-  throw "Not yet implemented";
+  switch (q) {
+    case q1: (Question)`<Str s> <Id name> : <Type t>`: 
+      return question("<s>", "<name>", cst2ast(t), src=q1@\loc);
+    case q2: (Question)`<Str s> <Id name> : <Type t> = <Expr e>`:
+      return questionComputed("<s>", "<name>", cst2ast(t) , cst2ast(e));
+    case q3: (Question)`{ <Question* qs> }`:
+      return questionBlock([ cst2ast(sample) | Question sample <- qs ]);
+    case q4: (Question)`if (<Expr ex>) <Question q1> else <Question q2>`:
+      return questionIfThenElse(cst2ast(ex), cst2ast(q1),cst2ast(q2));
+    case q5: (Question)`if(<Expr ex>) <Question q>`:
+      return questionIfThen(cst2ast(ex), cst2ast(q));
+  }
 }
 
 AExpr cst2ast(Expr e) {
