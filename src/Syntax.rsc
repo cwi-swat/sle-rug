@@ -13,7 +13,7 @@ start syntax Form
 // TODO: question, computed question, block, if-then-else, if-then
 syntax Question
   = Str Id ":" Type
-  | Str Id ":" Type "=" "(" Expr ")"
+  | Str Id ":" Type "=" Expr
   | "{" Question* "}"
   | "if" "(" Expr ")" Question "else" Question
   | "if" "(" Expr ")" Question
@@ -27,6 +27,7 @@ syntax Expr
   | Str
   | Bool
   | Int
+  > "(" Expr ")"
   > "!" Expr
   > left Expr "*" Expr
   > left Expr "/" Expr
@@ -48,6 +49,7 @@ syntax Type
 lexical Str = "\"" ![\"]* "\"";
 
 lexical Int 
-  = [1-9] [0-9]*;
+  = "-"?[1-9][0-9]*
+  | "0";
 
 lexical Bool = "true" | "false";
