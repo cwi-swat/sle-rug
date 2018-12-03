@@ -1,4 +1,4 @@
-module CST2AST
+  module CST2AST
 
 import Syntax;
 import AST;
@@ -31,21 +31,59 @@ AQuestion cst2ast(Question q) {
       return questionBlock([ cst2ast(sample) | Question sample <- qs ]);
     case q4: (Question)`if (<Expr ex>) <Question q1> else <Question q2>`:
       return questionIfThenElse(cst2ast(ex), cst2ast(q1),cst2ast(q2));
-    case q5: (Question)`if(<Expr ex>) <Question q>`:
-      return questionIfThen(cst2ast(ex), cst2ast(q));
+    case q5: (Question)`if(<Expr ex>) <Question q1>`:
+      return questionIfThen(cst2ast(ex), cst2ast(q1));
   }
 }
 
 AExpr cst2ast(Expr e) {
   switch (e) {
-    case (Expr)`<Id x>`: return ref("<x>", src=x@\loc);
-    
-    // etc.
-    
-    default: throw "Unhandled expression: <e>";
+    case (Expr)`<Id x>`: 
+    	return ref("<x>", src=x@\loc);
+    case (Expr)`<Str s>`: 
+    	return exprStr("<s>");
+    case (Expr)`<Bool b>`:
+    	return exprBool(b);
+    case (Expr)`<Int i>`:
+    	return exprInt(i);
+    case (Expr)`(<Expr ex>)`:
+    	return exprParentheses(cst2ast(ex));
+    case (Expr)`!<Expr ex>`:
+    	return exprNegation(cst2ast(ex));
+    case (Expr)`<Expr ex1> * <Expr ex2>`:
+    	return exprMultiply(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> / <Expr ex2>`:
+    	return exprDivide(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> + <Expr ex2>`:
+    	return exprAdd(cst2ast(ex1), cst2ast(ex2)); 
+    case (Expr)`<Expr ex1> - <Expr ex2>`:
+    	return exprSubtract(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> \> <Expr ex2>`:
+    	return exprGreaterThan(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> \< <Expr ex2>`:
+    	return exprLessThan(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> \<= <Expr ex2>`:
+    	return exprLessThanEq(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> \>= <Expr ex2>`:
+    	return exprGreaterThanEq(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> == <Expr ex2>`:
+    	return exprEquals(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> != <Expr ex2>`:
+    	return exprNotEquals(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> && <Expr ex2>`:
+    	return exprAnd(cst2ast(ex1), cst2ast(ex2));
+    case (Expr)`<Expr ex1> || <Expr ex2>`:
+    	return exprOr(cst2ast(ex1), cst2ast(ex2));
+   default: throw "Unhandled expression: <e>";
   }
 }
 
 AType cst2ast(Type t) {
-  throw "Not yet implemented";
+  switch (t) {
+  	case (Type)`boolean`:
+  		return typeBool();
+  	case (Type)`integer`:
+  		return typeInt();
+  default: throw "Unhandled Type: <t>";
+  }
 }

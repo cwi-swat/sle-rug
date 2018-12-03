@@ -1,6 +1,6 @@
 module AST
 
-/*
+/*  
  * Define Abstract Syntax for QL
  *
  * - complete the following data types
@@ -43,3 +43,4 @@ data AExpr(loc src = |tmp:///|)
 data AType(loc src = |tmp:///|)
   = typeBool()
   | typeInt();
+  
