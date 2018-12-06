@@ -14,11 +14,21 @@ data Type
 // the type environment consisting of defined questions in the form 
 alias TEnv = rel[loc def, str name, str label, Type \type];
 
-// To avoid recursively traversing the form, use the `visit` construct
-// or deep match (e.g., `for (/question(...) := f) {...}` ) 
-TEnv collect(AForm f) {
-  return {}; 
+Type aType2Type(AType at){
+	switch(at){
+		case boolean(): 
+			return tbool();
+		case integer():
+			return tint();
+		case string():
+			return tstr();
+		default: return tunknown(); 
+	}
 }
+
+TEnv collect(AForm f) = 
+ { <q.src, q.name, q.query, aType2Type(q.questionType)> | /AQuestion q := f && q has name};
+
 
 set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
   return {}; 
