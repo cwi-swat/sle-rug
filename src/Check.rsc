@@ -3,6 +3,8 @@ module Check
 import AST;
 import Resolve;
 import Message; // see standard library
+import Set;
+
 
 data Type
   = tint()
@@ -36,9 +38,9 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef)
 // - produce an error if there are declared questions with the same name but different types.
 // - duplicate labels should trigger a warning 
 // - the declared type computed questions should match the type of the expression.
-set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
-  return {}; 
-}
+set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) 
+  //= {warning("Duplicate label", q.src) | size(useDef[q.query]) > 1} 
+  = {error("Same question names with different types",q.src) | q has name && size((tenv<1,3>)[q.name]) > 1 }; 
 
 // Check operand compatibility with operators.
 // E.g. for an addition node add(lhs, rhs), 
