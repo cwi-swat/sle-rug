@@ -30,9 +30,8 @@ TEnv collect(AForm f) =
  { <q.src, q.name, q.query, aType2Type(q.questionType)> | /AQuestion q := f && q has name};
 
 
-set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
-  return {}; 
-}
+set[Message] check(AForm f, TEnv tenv, UseDef useDef)
+  = ( {} | it + check(q, tenv, useDef) | /AQuestion q := f );
 
 // - produce an error if there are declared questions with the same name but different types.
 // - duplicate labels should trigger a warning 
