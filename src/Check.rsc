@@ -43,28 +43,50 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 // Check operand compatibility with operators.
 // E.g. for an addition node add(lhs, rhs), 
 //   the requirement is that typeOf(lhs) == typeOf(rhs) == tint()
+set[Message] check(ref(str name, src = loc u), TEnv tenv, UseDef useDef)
+  = { error("Undeclared question", u) | useDef[u] == {} };
+  
 set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
   
   switch (e) {
-    case ref(str x, src = loc u):
+    case ref(str name, src = loc u):
       msgs += { error("Undeclared question", u) | useDef[u] == {} };
+    case multiply(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match int", u) | !BinaryAExprMatchType(e, tint(), tenv, useDef) };
+    case divide(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match int", u) | !BinaryAExprMatchType(e, tint(), tenv, useDef) };
+    case addition(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match int", u) | !BinaryAExprMatchType(e, tint(), tenv, useDef) };
+    case subtraction(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match int", u) | !BinaryAExprMatchType(e, tint(), tenv, useDef) };
+    case greaterThan(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match int", u) | !BinaryAExprMatchType(e, tint(), tenv, useDef) };
+    case lessThan(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match int", u) | !BinaryAExprMatchType(e, tint(), tenv, useDef) };
+    case lessThanEq(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match int", u) | !BinaryAExprMatchType(e, tint(), tenv, useDef) };
+    case greaterThanEq(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match int", u) | !BinaryAExprMatchType(e, tint(), tenv, useDef) };
+    case equals(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match", u) | typeOf(e.ex1, tenv, useDef) != typeOf(e.ex2, tenv, useDef) };
+    case notEquals(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match", u) | typeOf(e.ex1, tenv, useDef) != typeOf(e.ex2, tenv, useDef) };
+    case and(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match", u) | typeOf(e.ex1, tenv, useDef) != typeOf(e.ex2, tenv, useDef) };
+    case or(AExpr ex1, AExpr ex2, src = loc u):
+      msgs += { error("Types dont match", u) | typeOf(e.ex1, tenv, useDef) != typeOf(e.ex2, tenv, useDef) };
 
-    // etc.
   }
   
   return msgs; 
 }
 
-Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
-  switch (e) {
-    case ref(str x, src = loc u):  
-      if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
-        return t;
-      }
-    // etc.
-  }
-  return tunknown(); 
+bool BinaryAExprMatchType(AExpr e, Type t, TEnv tenv, UseDef useDef) {
+  if(typeOf(e.ex1, tenv, useDef) == typeOf(e.ex2, tenv ,useDef)
+    && typeOf(e.ex2, tenv, useDef) == t)
+    return true;
+  return false;
 }
 
 /* 
@@ -78,6 +100,26 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
  * default Type typeOf(AExpr _, TEnv _, UseDef _) = tunknown();
  *
  */
+Type typeOf(ref(str x, src = loc u), TEnv tenv, UseDef useDef) = t
+ when <u, loc d> <- useDef, <d, x, _, Type t> <- tenv;
+Type typeOf(string(str string)) = tstr();
+Type typeOf(boolean(bool b)) = tbool();
+Type typeof(integer(int i), TEnv tenv, UseDef useDef) = tint();
+Type typeof(parentheses(AExpr ex), TEnv tenv, UseDef useDef) = typeOf(ex, tenv, useDef);
+Type typeof(negation(AExpr ex), TEnv tenv, UseDef useDef) = typeOf(ex, tenv, useDef);
+Type typeof(multiply(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tint();
+Type typeof(divide(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tint();
+Type typeof(addition(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tint();
+Type typeof(subtraction(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tint();
+Type typeof(greaterThan(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tbool(); 
+Type typeof(lessThan(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tbool();
+Type typeof(lessThanEq(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tbool();
+Type typeof(greaterThanEq(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tbool();
+Type typeof(equals(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tbool();
+Type typeof(notEquals(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tbool();
+Type typeof(and(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tbool();
+Type typeof(or(AExpr ex1, AExpr ex2), TEnv tenv, UseDef useDef) = tbool();
+default Type typeOf(AExpr _, TEnv _, UseDef _) = tunknown();
  
  
 
