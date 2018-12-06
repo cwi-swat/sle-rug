@@ -29,22 +29,22 @@ syntax Expr
   | Int
   > "(" Expr ")"
   > "!" Expr
-  > left Expr "*" Expr
-  > left Expr "/" Expr
-  > left Expr "+" Expr
-  > left Expr "-" Expr
-  > left Expr "\>" Expr
-  > left Expr "\<" Expr
-  > left Expr "\<=" Expr
-  > left Expr "\>=" Expr
-  > left Expr "==" Expr
-  > left Expr "!=" Expr
+  > left ( left Expr "*" Expr
+          | left Expr "/" Expr)
+  > left ( left Expr "+" Expr
+         | left Expr "-" Expr)
+  > non-assoc ( left Expr "\>" Expr
+         | left Expr "\<" Expr
+         | left Expr "\<=" Expr
+         | left Expr "\>=" Expr
+         | left Expr "==" Expr
+         | left Expr "!=" Expr)
   > left Expr "&&" Expr
   > left Expr "||" Expr
   ;
   
 syntax Type
-  = "boolean" | "integer";
+  = "boolean" | "integer" | "string";
   
 lexical Str = "\"" ![\"]* "\"";
 
