@@ -34,8 +34,8 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef)
 // - duplicate labels should trigger a warning 
 // - the declared type computed questions should match the type of the expression.
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) 
-  //= {warning("Duplicate label", q.src) | size(useDef[q.query]) > 1} 
-  = {error("Same question names with different types",q.src) | q has name && size((tenv<1,3>)[q.name]) > 1 }; 
+  = {warning("Duplicate label", q.src) | size(tenv[q.label]) > 1} +
+   {error("Same question names with different types",q.src) | q has name && size((tenv<1,3>)[q.name]) > 1 }; 
 
 
 // Check an expression for invalid semantics
