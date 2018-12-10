@@ -1,14 +1,18 @@
-module dev
+module Dev
 
-import AST;
-import Check;
-import Compile;
-import CST2AST;
-import Eval;
-import IDE;
-import Resolve;
+import ParseTree;
+import vis::ParseTree;
 import Syntax;
-import Transform;
+import CST2AST;
+import Check;
+import Resolve;
+import Message;
 
-// Function to run the whole pipeline.
-//apt(parse(#start[Form], |project://QL/examples/errors.myql|));
+set[Message] main() {
+    // File to parse
+	concrete_pt = parse(#start[Form], |project://QL/examples/tax.myql|);
+	abstract_pt = cst2ast(concrete_pt);
+	
+	// Check for errors
+	return check(abstract_pt, collect(abstract_pt), resolve(abstract_pt));
+}
