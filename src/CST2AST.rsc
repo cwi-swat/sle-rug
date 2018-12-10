@@ -1,4 +1,4 @@
-  module CST2AST
+module CST2AST
 
 import Syntax;
 import AST;

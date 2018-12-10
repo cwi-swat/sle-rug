@@ -17,7 +17,7 @@ data AQuestion(loc src = |tmp:///|)
   | block(list[AQuestion] questions)
   | ifThenElse(AExpr ifCondition, AQuestion thenQuestion, AQuestion ElseQuestion)
   | ifThen(AExpr ifCondition, AQuestion thenQuestion)
-  ; 
+  ;
 
 data AExpr(loc src = |tmp:///|)
   = ref(str name)
