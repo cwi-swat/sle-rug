@@ -61,9 +61,23 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
 Value eval(AExpr e, VEnv venv) {
   switch (e) {
     case ref(str x): return venv[x];
-    
-    // etc.
-    
+    case string(str s): return vstr(s);
+    case boolean(bool b): return vbool(b);
+    case integer(int i): return vint(i);
+    case parentheses(AExpr ex): return eval(ex, venv);
+    case negation(AExpr ex): return vbool(!eval(ex, venv));
+    case multiply(AExpr ex1, AExpr ex2): return vint(eval(ex1, venv).n * eval(ex2,venv).n);
+    case divide(AExpr ex1, vint(0)): return vint(eval(ex1, venv).n / eval(ex2,venv).n);
+    case addition(AExpr ex1, AExpr ex2): return vint(eval(ex1, venv).n + eval(ex2,venv).n);
+    case subtraction(AExpr ex1, AExpr ex2): return vint(eval(ex1, venv).n - eval(ex2,venv).n);
+    case greaterThan(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n > eval(ex2,venv).n);
+    case lessThan(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n < eval(ex2,venv).n);
+    case lessThanEq(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n <= eval(ex2,venv).n);
+    case greaterThanEq(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n >= eval(ex2,venv).n);
+    case equals(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n == eval(ex2,venv).n);
+    case notEquals(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n != eval(ex2,venv).n);
+    case and(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n && eval(ex2,venv).n);
+    case or(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n || eval(ex2,venv).n);
     default: throw "Unsupported expression <e>";
   }
 }
