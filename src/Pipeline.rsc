@@ -1,4 +1,4 @@
-module Dev
+module Pipeline
 
 import ParseTree;
 import vis::ParseTree;
