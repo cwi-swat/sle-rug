@@ -50,6 +50,7 @@ VEnv evalOnce(AForm f, Input inp, VEnv venv) {
   for(AQuestion q <- f.questions) {
     venv = eval(q, inp, venv);
   }
+  return venv;
 }
 
  
@@ -62,11 +63,11 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
     case computed(str label, str name, AType questionType, AExpr expression):
     	venv[name] = eval(expression, venv);
     case block(list[AQuestion] questions):
-      for(AQuestion qq <- questions) { eval(qq, inp, venv); }
+      for(AQuestion qq <- questions) { venv = eval(qq, inp, venv); }
     case ifThenElse(AExpr ifCondition, AQuestion thenQuestion, AQuestion elseQuestion):
     	return (eval(ifCondition, venv) == vbool(true)) ? (eval(thenQuestion, inp, venv)) : (eval(elseQuestion, inp, venv));
     case ifThen(AExpr ifCondition, AQuestion thenQuestion):
-        if((eval(ifCondition, venv) == vbool(true))) { return eval(thenQuestion, inp, venv); }
+        if(eval(ifCondition, venv) == vbool(true)) { return eval(thenQuestion, inp, venv); }
   }
   return venv; 
 }
@@ -78,9 +79,9 @@ Value eval(AExpr e, VEnv venv) {
     case boolean(bool b): return vbool(b);
     case integer(int i): return vint(i);
     case parentheses(AExpr ex): return eval(ex, venv);
-    case negation(AExpr ex): return vbool(!eval(ex, venv));
+    case negation(AExpr ex): return vbool(!eval(ex,venv).b);
     case multiply(AExpr ex1, AExpr ex2): return vint(eval(ex1, venv).n * eval(ex2,venv).n);
-    case divide(AExpr ex1, vint(0)): return vint(eval(ex1, venv).n / eval(ex2,venv).n);
+    case divide(AExpr ex1, AExpr ex2): return vint(eval(ex1, venv).n / eval(ex2,venv).n);
     case addition(AExpr ex1, AExpr ex2): return vint(eval(ex1, venv).n + eval(ex2,venv).n);
     case subtraction(AExpr ex1, AExpr ex2): return vint(eval(ex1, venv).n - eval(ex2,venv).n);
     case greaterThan(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n > eval(ex2,venv).n);
@@ -89,8 +90,8 @@ Value eval(AExpr e, VEnv venv) {
     case greaterThanEq(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n >= eval(ex2,venv).n);
     case equals(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n == eval(ex2,venv).n);
     case notEquals(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n != eval(ex2,venv).n);
-    case and(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n && eval(ex2,venv).n);
-    case or(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).n || eval(ex2,venv).n);
+    case and(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).b && eval(ex2,venv).b);
+    case or(AExpr ex1, AExpr ex2): return vbool(eval(ex1, venv).b || eval(ex2,venv).b);
     default: throw "Unsupported expression <e>";
   }
 }
