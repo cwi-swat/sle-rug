@@ -47,15 +47,28 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
   
   
 VEnv evalOnce(AForm f, Input inp, VEnv venv) {
-  for(/AQuestion q := f) {
+  for(AQuestion q <- f.questions) {
     venv = eval(q, inp, venv);
   }
 }
 
+ 
 VEnv eval(AQuestion q, Input inp, VEnv venv) {
   // evaluate conditions for branching,
   // evaluate inp and computed questions to return updated VEnv
-  return (); 
+  switch(q) {
+    case question(str label, str name, AType questionType):
+        if(inp.question == name) { venv[name] = inp.\value; }
+    case computed(str label, str name, AType questionType, AExpr expression):
+    	venv[name] = eval(expression, venv);
+    case block(list[AQuestion] questions):
+      for(AQuestion qq <- questions) { eval(qq, inp, venv); }
+    case ifThenElse(AExpr ifCondition, AQuestion thenQuestion, AQuestion elseQuestion):
+    	return (eval(ifCondition, venv) == vbool(true)) ? (eval(thenQuestion, inp, venv)) : (eval(elseQuestion, inp, venv));
+    case ifThen(AExpr ifCondition, AQuestion thenQuestion):
+        if((eval(ifCondition, venv) == vbool(true))) { return eval(thenQuestion, inp, venv); }
+  }
+  return venv; 
 }
 
 Value eval(AExpr e, VEnv venv) {
