@@ -49,21 +49,21 @@ HTML5Node question2html(AQuestion q) {
     case question(str thequestion, str questionName, AType questionType):
       return div(
         label(\for("<questionName>"), thequestion),
-        input(name(questionName), type2html(q.questionType))
+        input(name(questionName), html5attr("v-model",questionName), type2html(q.questionType))
       );
     case computed(str thequestion, str questionName, AType questionType, AExpr expression):
       return div(
         label(\for("<questionName>"), thequestion),
-        input(name(questionName), type2html(q.questionType), readonly(""))
+        input(name(questionName), html5attr("v-model",questionName), type2html(q.questionType), readonly(""))
       );
     case block(list[AQuestion] qs):
       return div([question2html(q2) | AQuestion q2 <- qs]);
     case ifThenElse(AExpr ifCondition, AQuestion thenQuestion, AQuestion ElseQuestion):
       return 
-        div(id(sourceLocationToIdentifier(ifCondition.src)), question2html(thenQuestion), question2html(ElseQuestion));
+        div(html5attr("v-if",sourceLocationToIdentifier(ifCondition.src)), question2html(thenQuestion), question2html(ElseQuestion));
     case ifThen(AExpr ifCondition, AQuestion thenQuestion):
       return 
-        div(id(sourceLocationToIdentifier(ifCondition.src)), question2html(thenQuestion));
+        div(html5attr("v-if",sourceLocationToIdentifier(ifCondition.src)), question2html(thenQuestion));
   }
 }
 
@@ -80,7 +80,7 @@ HTML5Attr type2html(integer()) = \type("number");
  * Instead, we create a mapping from the loc expression.src -> str htmlIdentifierOfExpression
  */
 str sourceLocationToIdentifier(loc source)
-  =  "expr-<source.offset>-<source.length>-<source.begin.line>-<source.begin.column>";
+  =  "expr_<source.offset>_<source.length>_<source.begin.line>_<source.begin.column>";
 
 
 /**
@@ -106,7 +106,15 @@ str form2js(AForm f) {
          '    }
          '    <}>
          '    <}>
-         '    // TODO: Hide or Show div elements based on the if-statement in the QL
+         '
+         '    // Also put Conditional Expressions (in the QL-if) in variables, for hiding/showing sections
+         '    <for (/AQuestion q := f) {>
+         '    <if (q has ifCondition) {>
+         '    <sourceLocationToIdentifier(q.ifCondition.src)>:  function() {
+         '      return <expr2js(q.expression)>;
+         '    }
+         '    <}>
+         '    <}>
          '  }
          '});
          ";
@@ -114,9 +122,14 @@ str form2js(AForm f) {
 
 /**
   * Abstract Expressions should be compiled into javascript. Example: addition(AExpr a, AExpr b) -> expr2js(a) + expr2js(b)
+  * Use Abstract definitions here
   */
-str expr2js(AExpr ex)
-  = "";
+str expr2js(AExpr ex) {
+  switch(ex) {
+    case ref(str name):
+      return "this.<name>";
+  }
+}
 
 str myToString(HTML5Node x) { 
   attrs = { k | HTML5Attr k <- x.kids };  
