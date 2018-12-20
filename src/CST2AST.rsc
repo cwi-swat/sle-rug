@@ -23,7 +23,7 @@ AForm cst2ast(start[Form] sf) {
 }
 
 AForm cst2ast(f:(Form) `form <Id id> { <Question* qs> }`)
-  = form("<id>", [cst2ast(q) | Question q <- qs]);
+  = form("<id>", [cst2ast(q) | Question q <- qs], src = f@\loc);
 
 AQuestion cst2ast(Question q) {
   switch (q) {

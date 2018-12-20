@@ -9,8 +9,9 @@ import Resolve;
 import Message;
 import IO;
 import Eval;
+import Compile;
 
-VEnv main() {
+VEnv pipe() {
     // File to parse
 	concrete_pt = parse(#start[Form], |project://QL/examples/tax.myql|);
 	abstract_pt = cst2ast(concrete_pt);
@@ -26,8 +27,8 @@ VEnv main() {
 	}
 	
 	// Testing the resolve functions
-	VEnv venv = eval(abstract_pt, input("hasSoldHouse", vbool(true)), initialEnv(abstract_pt));
-	venv = eval(abstract_pt, input("sellingPrice", vint(42)), venv);
+	VEnv venv = Eval::eval(abstract_pt, input("hasSoldHouse", vbool(true)), initialEnv(abstract_pt));
+	venv = Eval::eval(abstract_pt, input("sellingPrice", vint(42)), venv);
 	
 	return venv;
 }
