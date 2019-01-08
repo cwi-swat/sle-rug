@@ -128,6 +128,41 @@ str expr2js(AExpr ex) {
   switch(ex) {
     case ref(str name):
       return "this.<name>";
+   	case string(str s):
+   	  return "<s>";
+   	case boolean(bool b):
+	  return "<b>";
+   	case integer(int i):
+   	  return "<i>";
+   	case negation(AExpr ex): 
+   	  return "!" + expr2js(ex);
+   	case parentheses(AExpr ex):
+   	  return "(" + expr2js(ex) + ")";
+    case multiply(AExpr ex1, AExpr ex2): 
+   	  return expr2js(ex1) + "*" + expr2js(ex2);
+    case divide(AExpr ex1, AExpr ex2): 
+      return expr2js(ex1) + "/" + expr2js(ex2);
+    case addition(AExpr ex1, AExpr ex2): 
+      return expr2js(ex1) + "+" + expr2js(ex2);
+    case subtraction(AExpr ex1, AExpr ex2): 
+      return expr2js(ex1) + "-" + expr2js(ex2);
+    case greaterThan(AExpr ex1, AExpr ex2):
+       return expr2js(ex1) + "\>" + expr2js(ex2);
+    case lessThan(AExpr ex1, AExpr ex2):       
+      return expr2js(ex1) + "\<" + expr2js(ex2);
+    case lessThanEq(AExpr ex1, AExpr ex2): 
+      return expr2js(ex1) + "\<=" + expr2js(ex2);
+    case greaterThanEq(AExpr ex1, AExpr ex2): 
+      return expr2js(ex1) + "\>=" + expr2js(ex2);
+    case equals(AExpr ex1, AExpr ex2): 
+      return expr2js(ex1) + "==" + expr2js(ex2);
+    case notEquals(AExpr ex1, AExpr ex2): 
+      return expr2js(ex1) + "!=" + expr2js(ex2);
+    case and(AExpr ex1, AExpr ex2): 
+      return expr2js(ex1) + "&&" + expr2js(ex2);
+    case or(AExpr ex1, AExpr ex2): 
+      return expr2js(ex1) + "||" + expr2js(ex2);
+    default: throw "Unsupported expression <ex>";
   }
 }
 
