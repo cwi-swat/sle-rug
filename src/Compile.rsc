@@ -34,7 +34,7 @@ HTML5Node form2html(AForm f) {
     ),
     body(
       div(id("app"),
-        [question2html(q) | AQuestion q <- f.questions]
+        div([question2html(q) | AQuestion q <- f.questions])
       )
     )
   );
@@ -54,7 +54,7 @@ HTML5Node question2html(AQuestion q) {
     case computed(str thequestion, str questionName, AType questionType, AExpr expression):
       return div(
         label(\for("<questionName>"), thequestion),
-        input(name(questionName), html5attr("v-model",questionName), type2html(q.questionType), readonly(""))
+        input(name(questionName), html5attr("v-model",questionName), type2html(q.questionType), readonly())
       );
     case block(list[AQuestion] qs):
       return div([question2html(q2) | AQuestion q2 <- qs]);
@@ -64,6 +64,7 @@ HTML5Node question2html(AQuestion q) {
     case ifThen(AExpr ifCondition, AQuestion thenQuestion):
       return 
         div(html5attr("v-if",sourceLocationToIdentifier(ifCondition.src)), question2html(thenQuestion));
+    default: throw "Unsupported question type encountered";
   }
 }
 
@@ -103,15 +104,15 @@ str form2js(AForm f) {
          '    <if (q has name && q has expression) {>
          '    <q.name>:  function() {
          '      return <expr2js(q.expression)>;
-         '    }
+         '    },
          '    <}>
          '    <}>
          '
          '    // Also put Conditional Expressions (in the QL-if) in variables, for hiding/showing sections
          '    <for (/AQuestion q := f) {>
-         '    <if (q has ifCondition) {>
+         '    <if (q has ifCondition && q has thenQuestion) {>
          '    <sourceLocationToIdentifier(q.ifCondition.src)>:  function() {
-         '      return <expr2js(q.expression)>;
+         '      return <expr2js(q.ifCondition)>;
          '    }
          '    <}>
          '    <}>
@@ -130,14 +131,16 @@ str expr2js(AExpr ex) {
       return "this.<name>";
    	case string(str s):
    	  return "<s>";
-   	case boolean(bool b):
-	  return "<b>";
+   	case boolean(true):
+	  return "true";
+   	case boolean(false):
+	  return "false";
    	case integer(int i):
    	  return "<i>";
-   	case negation(AExpr ex): 
-   	  return "!" + expr2js(ex);
-   	case parentheses(AExpr ex):
-   	  return "(" + expr2js(ex) + ")";
+   	case negation(AExpr ex2): 
+   	  return "!" + expr2js(ex2);
+   	case parentheses(AExpr ex2):
+   	  return "(" + expr2js(ex2) + ")";
     case multiply(AExpr ex1, AExpr ex2): 
    	  return expr2js(ex1) + "*" + expr2js(ex2);
     case divide(AExpr ex1, AExpr ex2): 
