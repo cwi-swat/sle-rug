@@ -29,13 +29,14 @@ void compile(AForm f) {
 HTML5Node form2html(AForm f) {
   return html(
     head(
-      title("Simple Query Language"),
-      script(src("https://cdn.jsdelivr.net/npm/vue"))
+      title("Simple Query Language")
     ),
     body(
       div(id("app"),
         div([question2html(q) | AQuestion q <- f.questions])
-      )
+      ),        
+      script(src("https://cdn.jsdelivr.net/npm/vue/dist/vue.js")),
+      script(src(f.src[extension="js"].file))
     )
   );
 }
@@ -54,7 +55,7 @@ HTML5Node question2html(AQuestion q) {
     case computed(str thequestion, str questionName, AType questionType, AExpr expression):
       return div(
         label(\for("<questionName>"), thequestion),
-        input(name(questionName), html5attr("v-model",questionName), type2html(q.questionType), readonly())
+        input(name(questionName), html5attr("v-model",questionName), type2html(q.questionType), readonly([]))
       );
     case block(list[AQuestion] qs):
       return div([question2html(q2) | AQuestion q2 <- qs]);
