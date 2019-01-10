@@ -37,7 +37,8 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef)
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) 
   = {warning("Duplicate label \"<q.label>\"", q.src) | q has label && size((tenv<2,0>)[q.label]) > 1} + 
   {error("Declared type \"<aType2Type(q.questionType)>\" should match the type of the expression \"<typeOf(q.expression,tenv,useDef)>\"", q.src) | q has expression && aType2Type(q.questionType) != typeOf(q.expression,tenv,useDef)} +
-   {error("Question name \"<q.name>\" has been declared with different types",q.src) | q has name && size((tenv<1,3>)[q.name]) > 1 };
+   {error("Question name \"<q.name>\" has been declared with different types",q.src) | q has name && size((tenv<1,3>)[q.name]) > 1 } +
+   {error("Condition must always be of type boolean", q.ifCondition.src) | q has ifCondition && typeOf(q.ifCondition, tenv, useDef) != tbool()};
 
 
 // Check an expression for invalid semantics
