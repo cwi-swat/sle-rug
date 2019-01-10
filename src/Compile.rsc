@@ -114,7 +114,7 @@ str form2js(AForm f) {
          '    <if (q has ifCondition && q has thenQuestion) {>
          '    <sourceLocationToIdentifier(q.ifCondition.src)>:  function() {
          '      return <expr2js(q.ifCondition)>;
-         '    }
+         '    },
          '    <}>
          '    <}>
          '  }
