@@ -39,15 +39,13 @@ AForm flatten(AForm f) {
   // Now, reconstruct a new abstract form
   list[AQuestion] finalQuestions = [];
   for(QuestionCondition qsc <- qscs) {
-    if(qsc<1> == 0) {
-      finalQuestions += ifThen(true, qsc<0>);
-    } else {
-      finalQuestions += ifThen( (boolean(true) | and(it, e) | AExpr e <- qsc<1>), qsc<0>);
-    }
+      // We use a reducer / fold method to use && on all ifconditions that apply to that question. base case = true
+      // Note that we need to preserve the src of the question, so that we are allowed to generate identifiers
+      finalQuestions += ifThen( (boolean(true, src=qsc<0>.src) | and(it, e, src=qsc<0>.src) | AExpr e <- qsc<1>), qsc<0>, src=qsc<0>.src);
   }
   
   // return it
-  return form(f.name, finalQuestions);
+  return form(f.name, finalQuestions, src=f.src);
 }
 
 /*
@@ -65,7 +63,7 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
       return flatten(thenQuestion, push(ifCondition, stack));
     case ifThenElse(AExpr ifCondition, AQuestion thenQuestion, AQuestion ElseQuestion):
       return flatten(thenQuestion, push(ifCondition,stack)) +
-        flatten(thenQuestion, push(not(ifCondition),stack));
+        flatten(thenQuestion, push(not(ifCondition, src=ifCondition.src),stack));
     case block(list[AQuestion] qs):
       return <stack, ( [] | it + flatten(q, stack)<1> | AQuestion q <- qs)>;
   }

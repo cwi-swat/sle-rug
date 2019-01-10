@@ -10,8 +10,10 @@ import Message;
 import IO;
 import Eval;
 import Compile;
+import Transform;
+import AST;
 
-VEnv pipe() {
+AForm pipe() {
     // File to parse
 	concrete_pt = parse(#start[Form], |project://QL/examples/tax.myql|);
 	abstract_pt = cst2ast(concrete_pt);
@@ -30,5 +32,9 @@ VEnv pipe() {
 	VEnv venv = Eval::eval(abstract_pt, input("hasSoldHouse", vbool(true)), initialEnv(abstract_pt));
 	venv = Eval::eval(abstract_pt, input("sellingPrice", vint(42)), venv);
 	
-	return venv;
+    // Apply transformations
+	abstract_pt = flatten(abstract_pt);
+	//compile(abstract_pt);
+	
+	return abstract_pt;
 }
