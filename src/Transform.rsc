@@ -1,5 +1,6 @@
 module Transform
 
+import Syntax;
 import Resolve;
 import AST;
 
@@ -10,7 +11,13 @@ import AST;
  
 /* Normalization:
  *  wrt to the semantics of QL the following
- *     q0: "" int; if (a) { if (b) { q1: "" int; } q2: "" int; }
+ *     q0: "" int; 
+ *     if (a) { 
+ *        if (b) { 
+ *          q1: "" int; 
+ *        } 
+ *        q2: "" int; 
+ *      }
  *
  *  is equivalent to
  *     if (true) q0: "" int;
@@ -30,10 +37,9 @@ AForm flatten(AForm f) {
  * Write a refactoring transformation that consistently renames all occurrences of the same name.
  * Use the results of name resolution to find the equivalence class of a name.
  *
- * Bonus: do it on concrete syntax trees.
  */
  
- AForm rename(AForm f, loc useOrDef, str newName, UseDef useDef) {
+ start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
    return f; 
  } 
  
