@@ -2,6 +2,8 @@ module Transform
 
 import Resolve;
 import AST;
+import List;
+import Syntax;
 
 /* 
  * Transforming QL forms
@@ -20,9 +22,26 @@ import AST;
  * Write a transformation that performs this flattening transformation.
  *
  */
- 
+
 AForm flatten(AForm f) {
-  return f; 
+  list[AExpr] stack = [];
+  for (AQuestion q <- f) {
+    tuple[list[AExpr], tuple[AQuestion, list[AExpr]]] tup = flatten(q, stack);
+  }
+  return f;
+}
+
+tuple[list[AExpr], list[tuple[AQuestion, list[AExpr]]]] flatten(AQuestion q, stack) {
+  switch(q) {
+    case question(str thequestion, str questionName, AType questionType):
+      return <stack, <q, stack>>;
+    case computed(str thequestion, str questionName, AType questionType, AExpr expression):
+      return <stack, <q, stack>>;
+    case ifThen(AExpr ifCondition, AQuestion thenQuestion):
+      return flatten(thenQuestion, push(ifCondition, stack));
+    case ifThenElse(AExpr ifCondition, AQuestion thenQuestion, AQuestion ElseQuestion):
+      return flatten(thenQuestion, push(ifCondition,stack));
+  }
 }
 
 /* Rename refactoring:
@@ -33,7 +52,7 @@ AForm flatten(AForm f) {
  * Bonus: do it on concrete syntax trees.
  */
  
- AForm rename(AForm f, loc useOrDef, str newName, UseDef useDef) {
+ AForm rename(Form f, loc useOrDef, str newName, UseDef useDef) {
    return f; 
  } 
  
