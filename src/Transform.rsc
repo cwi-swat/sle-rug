@@ -77,9 +77,35 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
  * Bonus: do it on concrete syntax trees.
  */
  
- AForm rename(Form f, loc useOrDef, str newName, UseDef useDef) {
-   return f; 
- } 
+ 
+ 
+ set[loc] eqClass(locc occ, UseDef ud) {
+ 	set[loc] class = {occ};
+ 	
+ 	class += {d | <occ, loc d> <- ud}
+ 		+ {u | <occ, loc d> <- ud, <loc u, d> <- ud};
+ 		
+ 	class += {u | <loc u, occ> <- ud};
+ 	return class;
+ }
+
+ 
+ bool validID(str name){
+	try ([Id]name); catch: return false;
+	return true;
+}
+
+ Form rename(Form f, loc useOrDef, str newName, UseDef useDef) {
+ 	assert useOrDef in occurences(ud): "not a name";
+ 	
+  	toRename = eqClass(useOrDef, useDef);
+  	assert validId(x): "Not a valid new name";
+  	
+  	return visit(f) {
+  		case Id y => [Id] newName
+  			when y@\loc in toRename;
+	}
+}
  
  
  
