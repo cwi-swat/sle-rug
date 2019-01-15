@@ -108,5 +108,4 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
 }
  
  
- 
 
