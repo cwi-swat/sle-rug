@@ -101,10 +101,10 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
   	toRename = eqClass(useOrDef, useDef);
   	assert validId(x): "Not a valid new name";
   	
-  	return visit(f) {
-  		case Id y => [Id] newName
-  			when y@\loc in toRename;
-	}
+  	return visit(f){
+  		case Id y => [Id] x
+  			when y@\loc in toRename
+  		};
 }
  
  
