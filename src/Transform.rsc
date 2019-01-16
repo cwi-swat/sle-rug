@@ -79,7 +79,7 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
  
  
  
- set[loc] eqClass(locc occ, UseDef ud) {
+ set[loc] eqClass(loc occ, UseDef ud) {
  	set[loc] class = {occ};
  	
  	class += {d | <occ, loc d> <- ud}
