@@ -5,6 +5,8 @@ import AST;
 import List;
 import Syntax;
 import CST2AST;
+import IO;
+import ParseTree;
 
 /* 
  * Transforming QL forms
@@ -101,21 +103,39 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
  } 
 
  
+ // We check if the name is a valid Identifier, by using a try-catch construct
  bool validID(str name){
 	try ([Id]name); catch: return false;
 	return true;
 }
 
+// Rename a (computed) question and all occurences of it
  Form rename(Form f, loc useOrDef, str newName, UseDef useDef) {
+ 	
+ 	// We have to make sure that we are renaming a valid name.
  	assert useOrDef in occurences(cst2ast(f)): "not a name";
  	
+ 	// We have to make sure that the new name has the correct format
+ 	assert validID(newName): "Not a valid new name";
+ 	
+ 	// Get all Question-locations and Expression-locations
   	toRename = eqClass(useOrDef, useDef);
-  	assert validID(newName): "Not a valid new name";
   	
+  	// The new name will be an identifier, constructed from a string
+  	Id newNameId = [Id] newName;
+  	
+  	// We are matching all (nested) constructs within the form
   	return visit(f){
-  		case Id y => [Id] newName
-  			when (y@\loc) in toRename
-  		};
+  		// In case we have a question, of which the location is in toRename, we update the identifier
+  		case q0: (Question)`<Str s> <Id name> : <Type t>` => (Question)`<Str s> <Id newNameId> : <Type t>`
+  			when (q0@\loc) in toRename
+  		// In case we have a computed question, of which the location is in toRename, we update the identifier
+  		case q1: (Question)`<Str s> <Id name> : <Type t> = <Expr e>` => (Question)`<Str s> <Id newNameId> : <Type t> = <Expr e>`
+  			when (q1@\loc) in toRename
+  		// In case we have an identifier, of which the location is in toRename, we update it.
+  		case q2: Id x => newNameId
+  			when (q2@\loc) in toRename
+  	};
 }
  
  
