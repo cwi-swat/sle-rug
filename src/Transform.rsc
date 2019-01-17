@@ -4,6 +4,7 @@ import Resolve;
 import AST;
 import List;
 import Syntax;
+import CST2AST;
 
 /* 
  * Transforming QL forms
@@ -88,6 +89,16 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
  	class += {u | <loc u, occ> <- ud};
  	return class;
  }
+ 
+ set[loc] occurences(AForm f) {
+    // Uses
+    set[loc] occurences = uses(f)<0>;
+    
+    // Declarations
+    occurences += defs(f)<1>;
+    
+    return occurences;
+ } 
 
  
  bool validID(str name){
@@ -96,16 +107,25 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
 }
 
  Form rename(Form f, loc useOrDef, str newName, UseDef useDef) {
- 	assert useOrDef in occurences(ud): "not a name";
+ 	assert useOrDef in occurences(cst2ast(f)): "not a name";
  	
   	toRename = eqClass(useOrDef, useDef);
-  	assert validId(x): "Not a valid new name";
+  	assert validID(newName): "Not a valid new name";
   	
   	return visit(f){
-  		case Id y => [Id] x
-  			when y@\loc in toRename
+  		case Id y => [Id] newName
+  			when (y@\loc) in toRename
   		};
 }
+
+ start[Form] rename2(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
+   set[loc] occurrences = {l1 | <loc l1, loc l2> <- useDef, l2 == useOrDef} 
+                        + {l2 | <loc l1, loc l2> <- useDef, l1 == useOrDef} 
+                        + useOrDef;
+   return visit(f) {
+     case Id x => [Id]newName when (x@\loc) in occurrences
+   }
+ }
  
  
 
