@@ -66,9 +66,9 @@ void flattenCompile(str fileName)
   = compile(flattenForm(fileName));
   
 // Week 7: Transformation - Renaming a variable
-Form renameRandomVar(str fileName)
+start[Form] renameRandomVar(str fileName)
   = rename(
-      concreteSyntaxTree(fileName).top, 
+      concreteSyntaxTree(fileName), 
       takeOneFrom(occurences(abstractSyntaxTree(fileName)))<0>,
       "newVariableName",
       resolve(abstractSyntaxTree(fileName))

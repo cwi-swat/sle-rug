@@ -1,5 +1,6 @@
 module Transform
 
+import Syntax;
 import Resolve;
 import AST;
 import List;
@@ -10,20 +11,6 @@ import ParseTree;
 
 /* 
  * Transforming QL forms
- */
- 
- 
-/* Normalization:
- *  wrt to the semantics of QL the following
- *     q0: "" int; if (a) { if (b) { q1: "" int; } q2: "" int; }
- *
- *  is equivalent to
- *     if (true) q0: "" int;
- *     if (a && b) q1: "" int;
- *     if (a) q2: "" int;
- *
- * Write a transformation that performs this flattening transformation.
- *
  */
  
  alias ifConditions = list[AExpr];
@@ -71,16 +58,6 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
       return <stack, ( [] | it + flatten(q, stack)<1> | AQuestion q <- qs)>;
   }
 }
-
-/* Rename refactoring:
- *
- * Write a refactoring transformation that consistently renames all occurrences of the same name.
- * Use the results of name resolution to find the equivalence class of a name.
- *
- * Bonus: do it on concrete syntax trees.
- */
- 
- 
  
  set[loc] eqClass(loc occ, UseDef ud) {
  	set[loc] class = {occ};
@@ -100,6 +77,7 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
     occurences += defs(f)<1>;
     
     return occurences;
+
  } 
 
  
@@ -110,10 +88,10 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
 }
 
 // Rename a (computed) question and all occurences of it
- Form rename(Form f, loc useOrDef, str newName, UseDef useDef) {
+ start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
  	
  	// We have to make sure that we are renaming a valid name.
- 	assert useOrDef in occurences(cst2ast(f)): "not a name";
+ 	assert useOrDef in occurences(cst2ast(f.top)): "not a name";
  	
  	// We have to make sure that the new name has the correct format
  	assert validID(newName): "Not a valid new name";
