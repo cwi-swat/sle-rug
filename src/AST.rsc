@@ -7,10 +7,12 @@ module AST
  * - make sure there is an almost one-to-one correspondence with the grammar
  */
 
+// Composition of an abstract Form, having both a name and a list of questions
 data AForm(loc src = |tmp:///|)
   = form(str name, list[AQuestion] questions)
   ; 
 
+// An Abstract Question can be 5 types of questions, analogous to the CST
 data AQuestion(loc src = |tmp:///|)
   = question(str label, str name, AType questionType)
   | computed(str label, str name, AType questionType, AExpr expression)
@@ -19,6 +21,8 @@ data AQuestion(loc src = |tmp:///|)
   | ifThen(AExpr ifCondition, AQuestion thenQuestion)
   ;
 
+// Composition of all the different Abstract Expressions
+// Analogous to the CST-grammar
 data AExpr(loc src = |tmp:///|)
   = ref(str name)
   | string(str string)
@@ -40,6 +44,7 @@ data AExpr(loc src = |tmp:///|)
   | or(AExpr ex1, AExpr ex2)
   ;
 
+// Defining an abstract representation of the three types
 data AType(loc src = |tmp:///|)
   = boolean()
   | integer()

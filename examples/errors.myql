@@ -1,29 +1,41 @@
 form taxOfficeExample { 
+
+  // Demonstration of same name with different type-error
   "Did you sell a house in 2010?"
     hasBoughtHouse: boolean
     
     "This is an example of duplicate question declaration"
      hasBoughtHouse: integer
     
+    
+    // Demonstration of the same label, triggers a warning
   "Did you enter a loan?"
     hasMaintLoan: boolean
     
-  "Did you sell a house in 2010?"
+  "Did you enter a loan?"
     hasSoldHouse: integer
     
+    
+    // Demonstration of when a Computed Question-Type doesn't match the Expression Type
+    "This is a computed Question"
+      computedMismatch: integer = true
+      
+      
+  // Demonstration of when a Condition-type is not a boolean
   if(hasSoldHouse) {
         "What was the selling prices?"
       sellingPrice2: boolean
   }
-    
+   
+  // Demonstration of when a question is referenced that does not exist 
   if (hasSodHouse) {
     "What was the selling price?"
       sellingPrice: boolean
-    "Private debts for the sold house:"
-      privateDebt: integer
-    "Value residue:"
-      valueResidue: integer = 
-        ((sellingPrice - privateDebt) * true)
   }
+  
+  // Demonstration of when an Expression tries to operate on invalid types
+  "Value residue:"
+  valueResidue: integer = 
+    ((sellingPrice - privateDebt) * true)
   
 }

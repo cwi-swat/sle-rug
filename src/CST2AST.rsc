@@ -8,23 +8,22 @@ import String;
 import Boolean;
 
 /*
- * Implement a mapping from concrete syntax trees (CSTs) to abstract syntax trees (ASTs)
- *
- * - Use switch to do case distinction with concrete patterns (like in Hack your JS) 
- * - Map regular CST arguments (e.g., *, +, ?) to lists 
- *   (NB: you can iterate over * / + arguments using `<-` in comprehensions or for-loops).
- * - Map lexical nodes to Rascal primitive types (bool, int, str)
- * - See the ref example on how to obtain and propagate source locations.
+ * A mapping from concrete syntax trees (CSTs) to abstract syntax trees (ASTs)
  */
 
+// We want to use the Form itself, so we remove layout before and after the form
 AForm cst2ast(start[Form] sf) {
-  Form f = sf.top; // remove layout before and after form
+  Form f = sf.top;
   return cst2ast(sf.top);
 }
 
+// To convert a concrete Form to an Abstract form,
+// We define a names, and propagate cst2ast to the individual questions
 AForm cst2ast(f:(Form) `form <Id id> { <Question* qs> }`)
   = form("<id>", [cst2ast(q) | Question q <- qs], src = f@\loc);
 
+// We convert all different type of questions to AQuestion
+// It's important to keep source locations, for later
 AQuestion cst2ast(Question q) {
   switch (q) {
     case q1: (Question)`<Str s> <Id name> : <Type t>`: 
@@ -40,6 +39,7 @@ AQuestion cst2ast(Question q) {
   }
 }
 
+// Converting individual expressions to Abstract Expressions
 AExpr cst2ast(Expr e) {
   switch (e) {
     case e1: (Expr)`<Id x>`: 
@@ -82,6 +82,7 @@ AExpr cst2ast(Expr e) {
   }
 }
 
+// Conversion of Concrete Types to Abstract Types
 AType cst2ast(Type t) {
   switch (t) {
   	case t1: (Type)`boolean`:

@@ -3,12 +3,6 @@ module Eval
 import AST;
 import Resolve;
 
-/*
- * Implement big-step semantics for QL
- */
- 
-// NB: Eval may assume the form is type- and name-correct.
-
 
 // Semantic domain for expressions (values)
 data Value
@@ -24,6 +18,7 @@ alias VEnv = map[str name, Value \value];
 data Input
   = input(str question, Value \value);
   
+// Declare standard values for all the different types for initialization
 Value sdValueOfType(boolean()) = vbool(false);
 Value sdValueOfType(integer()) = vint(0);
 Value sdValueOfType(string()) = vstr("");
@@ -40,23 +35,13 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
     venv = evalOnce(f, inp, venv);
   }
 }
-
-
-// evalOnce(AForm f, Input inp, VEnv venv) 
-//  = { v | AQuestion q := f && v = eval(q, inp, venv)} ; 
   
-  
-VEnv evalOnce(AForm f, Input inp, VEnv venv) {
-  for(AQuestion q <- f.questions) {
-    venv = eval(q, inp, venv);
-  }
-  return venv;
-}
+// Evaluate the new answer once for each question
+VEnv evalOnce(AForm f, Input inp, VEnv venv)
+  = ( venv | eval(q, inp, it) | AQuestion q <- f.questions);
 
- 
+// Evaluate the new value of this specific question
 VEnv eval(AQuestion q, Input inp, VEnv venv) {
-  // evaluate conditions for branching,
-  // evaluate inp and computed questions to return updated VEnv
   switch(q) {
     case question(str label, str name, AType questionType):
         if(inp.question == name) { venv[name] = inp.\value; }
@@ -72,6 +57,7 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
   return venv; 
 }
 
+// Evaluate the value of an Abstract Expression
 Value eval(AExpr e, VEnv venv) {
   switch (e) {
     case ref(str x): return venv[x];
