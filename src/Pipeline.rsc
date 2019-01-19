@@ -15,6 +15,7 @@ import Transform;
 import AST;
 import String;
 import List;
+import Set;
 
 // Week 2: Syntax.rsc -> Parsing a QL-Source code file into a Concrete Syntax Tree
 start[Form] concreteSyntaxTree(str fileName)
@@ -37,52 +38,38 @@ set[Message] checkFile(str fileName)
   = check(abstractSyntaxTree(fileName), collect(abstractSyntaxTree(fileName)), resolve(abstractSyntaxTree(fileName)));
 
 // Week 5: Simulating an Interpreter
-
-Input randomValue(AForm f) {
-  // Possible question names
-  int rand = arbInt(3);
-  list[str] names = [ q.name | /AQuestion q <- f.questions, q has name];
-  switch(rand) {
-    case 0:
-      return input(takeOneFrom(names)<0>, vint(arbInt(1000)));
-    case 1:
-      return input(takeOneFrom(names)<0>, vbool(takeOneFrom([true, false])<0>));
-    case 2:
-      return input(takeOneFrom(names)<0>, vstr(toString(arbInt(10000000))));
-  }
-}
-
-VEnv runInterpreter(str fileName, int n) {
+VEnv interpreterInput(str fileName, list[Input] is) {
   AForm f = abstractSyntaxTree(fileName);
   VEnv v = initialEnv(f);
-  for(int i <- [0..n]) {
-    v = eval(f, randomValue(f), v);
+  for(Input i <- is) {
+    v = eval(f, i, v);
   }
   return v;
 }
 
-AForm pipe() {
-    // File to parse
-	concrete_pt = parse(#start[Form], |project://QL/examples/tax.myql|);
-	abstract_pt = cst2ast(concrete_pt);
-	
-	// Check for warnings before errors, and print them	
-	for(warning(str msg, loc at) <- check(abstract_pt, collect(abstract_pt), resolve(abstract_pt))) {
-	  println("WARNING: " + msg + " at: <at>");
-	}
-	
-	// Check for errors now, and print them	
-	for(error(str msg, loc at) <- check(abstract_pt, collect(abstract_pt), resolve(abstract_pt))) {
-	  println("ERROR: " + msg + " at: <at>");
-	}
-	
-	// Testing the resolve functions
-	VEnv venv = Eval::eval(abstract_pt, input("hasSoldHouse", vbool(true)), initialEnv(abstract_pt));
-	venv = Eval::eval(abstract_pt, input("sellingPrice", vint(42)), venv);
-	
-    // Apply transformations
-	abstract_pt = flatten(abstract_pt);
-	//compile(abstract_pt);
-	
-	return abstract_pt;
+VEnv runInterpreter() {
+  return interpreterInput("tax", [
+  	input("hasBoughtHouse", vbool(true)),
+  	input("hasMaintLoan", vbool(true)),
+  	input("hasSoldHouse", vbool(true)),
+  	input("sellingPrice", vint(1000)),
+  	input("privateDebt", vint(500))
+  ]);
 }
+
+// Week 6: Compilation is done by saving a file
+// Week 7: Transformation - Flattening a form
+AForm flattenForm(str fileName)
+  = flatten(abstractSyntaxTree(fileName));
+
+void flattenCompile(str fileName)
+  = compile(flattenForm(fileName));
+  
+// Week 7: Transformation - Renaming a variable
+Form renameRandomVar(str fileName)
+  = rename(
+      concreteSyntaxTree(fileName).top, 
+      takeOneFrom(occurences(abstractSyntaxTree(fileName)))<0>,
+      "newVariableName",
+      resolve(abstractSyntaxTree(fileName))
+    );
