@@ -51,13 +51,16 @@ tuple[ifConditions, QuestionConditionList] flatten(AQuestion q, ifConditions sta
       return <stack, [<q, stack>]>;
     case ifThen(AExpr ifCondition, AQuestion thenQuestion):
       return flatten(thenQuestion, push(ifCondition, stack));
-    case ifThenElse(AExpr ifCondition, AQuestion thenQuestion, AQuestion ElseQuestion):
-      return flatten(thenQuestion, push(ifCondition,stack)) +
-        flatten(thenQuestion, push(not(ifCondition, src=ifCondition.src),stack));
+    case c3: ifThenElse(AExpr ifCondition, AQuestion thenQuestion, AQuestion ElseQuestion):
+      return combineTuple(flatten(thenQuestion, push(ifCondition,stack)),
+        flatten(ElseQuestion, push(negation(ifCondition, src=ifCondition.src),stack)));
     case block(list[AQuestion] qs):
       return <stack, ( [] | it + flatten(q, stack)<1> | AQuestion q <- qs)>;
   }
 }
+
+tuple[ifConditions, QuestionConditionList] combineTuple(tuple[ifConditions firstIfs, QuestionConditionList firstQs] t1, tuple[ifConditions sndIfs, QuestionConditionList sndQs] t2)
+  = <t2.sndIfs, t1.firstQs + t2.sndQs>;
  
  set[loc] eqClass(loc occ, UseDef ud) {
  	set[loc] class = {occ};

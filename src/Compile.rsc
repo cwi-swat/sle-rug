@@ -82,7 +82,7 @@ HTML5Attr type2html(integer()) = \type("number");
  * Instead, we create a mapping from the loc expression.src -> str htmlIdentifierOfExpression
  */
 str sourceLocationToIdentifier(loc source)
-  =  "expr_<source.offset>_<source.length>_<source.begin.line>_<source.begin.column>";
+  =  "expr_<source.offset>_<source.length>_<source.begin.line>_<source.begin.column>_<source.end.line>_<source.end.column>";
 
 
 /**
