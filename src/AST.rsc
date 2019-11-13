@@ -15,7 +15,10 @@ data AQuestion(loc src = |tmp:///|)
   ; 
 
 data AExpr(loc src = |tmp:///|)
-  = ref(str name)
+  = ref(AId id)
   ;
+
+data AId(loc src = |tmp:///|)
+  = id(str name);
 
 data AType(loc src = |tmp:///|);

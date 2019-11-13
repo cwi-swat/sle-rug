@@ -13,7 +13,7 @@ This page: [https://cwi-swat.github.io/sle-rug/](https://cwi-swat.github.io/sle-
 
 Book: *Software Languages: Syntax, Semantics, and Metaprogramming*, by Ralf L&auml;mmel. The book is for sale here: [Springer](https://www.springer.com/gp/book/9783319907987), [Amazon](https://www.amazon.de/Software-Languages-Syntax-Semantics-Metaprogramming/dp/3319907980) *FREE E-book*: [https://rug.on.worldcat.org/oclc/1036771828](https://rug.on.worldcat.org/oclc/1036771828).
 
-Detailed schedule: [rooster.rug.nl](http://rooster.rug.nl/?LayoutMode=Wide&nestorcode=WBCS18001.2018-2019)
+Detailed schedule: [rooster.rug.nl](https://rooster.rug.nl/#/nl/2019-2020/course/WBCS18001/timeRange=all)
 
 - Week 1: Introduction (Chapters 1 & 2)
 - Week 2: Concrete syntax (Chapters 6 & 7)
@@ -24,24 +24,14 @@ Detailed schedule: [rooster.rug.nl](http://rooster.rug.nl/?LayoutMode=Wide&nesto
 - Week 7: Transformation (Chapters 5 & 12)
 - Week 8: Wrap up & grading of lab starts
 
-Exam: *Friday 25th of January*, 14:00-17:00
-
-Re-examination: *Monday 25th of February*, 19:00–22:00
 
 ### Lab
 
 Fork the [sle-rug](https://github.com/cwi-swat/sle-rug) repository, import the Eclipse project in the root directory, and see the provided modules in `src` for detailed instructions for the exercises from week 2 on. 
 
-Notes about hack your javascript:
-
-- If you get the error "annotation Hyperlinks has been declared before...", remove ",str" from `rel[loc, loc, str]`, and remove ", x" from the *first* occurance of `<u, d, x>` where you find it in the module `javascript::Plugin`.
-
-- Start console and do `import javascript::Plugin;` and then `main()`.
-
-NB: the transformations are run after *saving* an SJS file. Open the associated HTML files to see the result.
 
 
-- Week 1: Install the *unstable* [Rascal Eclipse Plugin](https://www.rascal-mpl.org/start/); so use the following update URL [https://update.rascal-mpl.org/unstable/](https://update.rascal-mpl.org/unstable/). Do the [Hack your Javascript](https://github.com/cwi-swat/hack-your-javascript) tutorial.
+- Week 1: Install the *unstable* [Rascal Eclipse Plugin](https://www.rascal-mpl.org/start/); so use the following update URL [https://update.rascal-mpl.org/unstable/](https://update.rascal-mpl.org/unstable/). Do the [Rascal Introduction Tutorial](https://github.com/cwi-swat/rascal-wax-on-wax-off).
 - Week 2: Concrete syntax of QL using Rascal's grammar formalism (module `Syntax`)
 - Week 3: Abstract syntax and name analysis of QL (modules `AST`, `CST2AST` and `Resolve`)
 - Week 4: Type checker for QL (module `Check`)
@@ -59,7 +49,7 @@ Here is some more detail:
 - The QL syntax consists of a form, containing questions. A question can be a normal question, or a computed question. A computed question has an associated expression which defines its value. Both kinds of questions have a label (to show to the user), an identifier, and a type. The conditional construct comes in two variants `if` and `if-else`. A block construct using `{}` can be used to group questions. 
 
 - Questions are enabled and disabled when different values are
-  entered, dependening on their conditional context.
+  entered, depending on their conditional context.
   
 - The type checker detects:
    * reference to undefined questions

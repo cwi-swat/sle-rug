@@ -21,8 +21,8 @@ import AST;
  *
  *  is equivalent to
  *     if (true) q0: "" int;
- *     if (a && b) q1: "" int;
- *     if (a) q2: "" int;
+ *     if (true && a && b) q1: "" int;
+ *     if (true && a) q2: "" int;
  *
  * Write a transformation that performs this flattening transformation.
  *
