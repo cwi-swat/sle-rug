@@ -50,7 +50,7 @@ syntax Type
 
 // Also parses " \" \" " as a singular string rather than two.
 lexical Str
-= "\""("\\\""|![\"])*"\"";
+  = "\""("\\\""|![\"])*"\"";
 
 lexical Int 
   = [^0-9]+;
