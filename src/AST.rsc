@@ -12,8 +12,8 @@ data AForm(loc src = |tmp:///|)
   ;
 
 data AQuestion(loc src = |tmp:///|)
-  = question(str q, AId id, AType type_, list[AExpr] expr)
-  | cond(AExpr c, list[AQuestion] if_, list[AQuestion] else_)
+  = question(str q, AId id, AType \type, list[AExpr] expr)
+  | cond(AExpr c, list[AQuestion] \if, list[AQuestion] \else)
   ;
 
   data AExpr(loc src = |tmp:///|)
@@ -33,12 +33,12 @@ data AQuestion(loc src = |tmp:///|)
   | or(AExpr expr1, AExpr expr2)
   | ref(AId id)
   | integer(int n)
-  | boolean(str bool_)
+  | boolean(str \bool)
   ;
 
 data AId(loc src = |tmp:///|)
   = id(str name);
 
 data AType(loc src = |tmp:///|)
-  = type_(str type_);
+  = \type(str \type);
  
