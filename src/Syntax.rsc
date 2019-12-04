@@ -8,12 +8,13 @@ extend lang::std::Id;
  */
 
 start syntax Form 
-  = "form" Id "{" Question* "}"; 
+  = "form" Id name "{" Question* questions "}"; 
 
 // TODO: question, computed question, block, if-then-else, if-then
 syntax Question 
   = Str Id ":" Type ( "=" Expr )?
-  | "if" "(" Expr ")" "{" Question* "}" ( "else" "{" Question* "}" )?
+  | "if" "(" Expr ")" "{" Question* "}" 
+  | "if" "(" Expr ")" "{" Question* "}"  "else" "{" Question* "}" 
   ; 
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
