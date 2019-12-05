@@ -38,8 +38,8 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
   
   switch (e) {
-    case ref(str x, src = loc u):
-      msgs += { error("Undeclared question", u) | useDef[u] == {} };
+    case ref(AId x):
+      msgs += { error("Undeclared question", x.src) | useDef[x.src] == {} };
 
     // etc.
   }
@@ -49,7 +49,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 
 Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
   switch (e) {
-    case ref(str x, src = loc u):  
+    case ref(id(_, src = loc u)):  
       if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
         return t;
       }
@@ -61,7 +61,7 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
 /* 
  * Pattern-based dispatch style:
  * 
- * Type typeOf(ref(str x, src = loc u), TEnv tenv, UseDef useDef) = t
+ * Type typeOf(ref(id(_, src = loc u)), TEnv tenv, UseDef useDef) = t
  *   when <u, loc d> <- useDef, <d, x, _, Type t> <- tenv
  *
  * ... etc.
