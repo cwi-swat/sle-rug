@@ -14,7 +14,7 @@ start syntax Form
 syntax Question 
   = Str Id ":" Type ( "=" Expr )?
   | "if" "(" Expr ")" "{" Question* "}" 
-  | "if" "(" Expr ")" "{" Question* "}"  "else" "{" Question* "}" 
+  | "if" "(" Expr ")" "{" Question* "}" "else" "{" Question* "}" 
   ; 
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
