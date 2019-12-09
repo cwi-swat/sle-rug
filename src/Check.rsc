@@ -3,6 +3,7 @@ import IO;
 import AST;
 import Resolve;
 import Message; // see standard library
+import Set;
 
 data Type
   = tint()
@@ -21,19 +22,20 @@ TEnv collect(AForm f) {
 }
 
 Type AType2Type(AType at){
+	// print(at);
 	switch(at){
-		case (AType)`type(integer)`: return tint();
-		case (AType)`type(boolean)`: return tbool();
-		default: {return tint();}
+		case \type("boolean"): return tbool();
+		case \type("integer"): return tint();
+		
+		default: {return tunknown();}
 	}
 }
 
 set[Message] check(AForm f, TEnv tenv, UseDef useDef){
-  set[Message] msgs = {}; 
-  //Undefined State
-  //msgs += {error("Undefined State", u) |
-  //		   <loc u, _> <- useDef.uses, 
-  //		 	u notin useDef<use>};
+  set[Message] msgs = {};
+  for(/q:question(str _, AId _, AType _, list[AExpr] _) := f){
+  	msgs += check(q, tenv, useDef);
+  }
   return msgs; 
 }
 
@@ -42,11 +44,13 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef){
 // - the declared type computed questions should match the type of the expression.
 
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
-	set[Message]msgs = {};
+	set[Message] msgs = {};
+	// msgs += error("test", q.src);
+	set[Type] types = {};
 	
-	msgs += { error("questions with the same name but different types", d)
-	   			| <_, loc d> <- useDef.defs
-	   			, d notin useDef<def>};  
+	
+	// idea: pattern match q.name on tenv
+	// throw error if more than one result
 	return msgs;
 }
 
@@ -78,9 +82,17 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
     case not(AExpr ex):
       return tbool();
     case add(AExpr ex1, AExpr ex2): {
-      t1 = typeOf(ex1, tenv, useDef);
-      t2 = typeOf(ex1, tenv, useDef);
+      if((typeOf(ex1, tenv, useDef) == tint()) 
+        && (typeOf(ex2, tenv, useDef) == tint())){
+      	return tint();
+      } else {
+      	return tunknown();
+      }
     }
+    case integer(int n):
+      return tint();
+    case boolean(str \bool):
+      return tbool();
 
   }
   return tunknown(); 
