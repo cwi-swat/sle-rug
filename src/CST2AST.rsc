@@ -31,7 +31,7 @@ AQuestion cst2ast(Question q) {
     case (Question)`if ( <Expr expr> ) { <Question* x0> }`:
       return cond(cst2ast(expr), [cst2ast(q2) | q2 <- x0], [], src=q@\loc);
     case (Question)`if ( <Expr expr> ) { <Question* x0> } else { <Question* x1>}`:
-      return cond(cst2ast(expr), [cst2ast(q2) | q2 <- x0], [cst2ast(q2) |Question q2 <- x1], src=q@\loc);
+      return cond(cst2ast(expr), [cst2ast(q2) | Question q2 <- x0], [cst2ast(q2) | Question q2 <- x1], src=q@\loc);
   }
   
   throw "Not yet implemented <q>";
