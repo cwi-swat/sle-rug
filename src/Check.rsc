@@ -22,7 +22,6 @@ TEnv collect(AForm f) {
 }
 
 Type AType2Type(AType at){
-	// print(at);
 	switch(at){
 		case \type("boolean"): return tbool();
 		case \type("integer"): return tint();
@@ -46,7 +45,29 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef){
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 	set[Message] msgs = {};
 	// msgs += error("test", q.src);
-	set[Type] types = {};
+	// same label different
+	// obtain label
+	str label;
+	for(/question(str l, _, _, _) := q){
+		label = l;
+	}
+	
+	// same label twice
+	i = 0;
+	for(/<_, _, label, _> := tenv){
+		i += 1;
+	}
+	if(i > 1){
+		msgs += warning("<q.src>" + "Duplicate label");
+	}
+	
+	// same label, different types
+	set[Type] types = {AType2Type(t) | /question(label, _, AType t, _) := q};
+	if(types != {AType2Type(q.\type)}){
+		msgs += error("<q.src>" + "Same label, different type");
+	}
+	// TODO: type of question does not match type of expression
+	// set[Type] types = {};
 	
 	
 	// idea: pattern match q.name on tenv
@@ -72,23 +93,60 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 
 Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
   switch (e) {
-    case ref(str x, src = loc u):  
-      if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
-        return t;
-      }
+    
     // etc.
     case brackets(AExpr ex):
       return typeOf(ex, tenv, useDef);
     case not(AExpr ex):
       return tbool();
-    case add(AExpr ex1, AExpr ex2): {
-      if((typeOf(ex1, tenv, useDef) == tint()) 
-        && (typeOf(ex2, tenv, useDef) == tint())){
-      	return tint();
-      } else {
-      	return tunknown();
-      }
+    case divide(AExpr expr1, AExpr expr2): {
+    	return tunknown();
     }
+    case multiply(AExpr expr1, AExpr expr2): {
+    	return tint();
+    }
+    case add(AExpr expr1, AExpr expr2): {
+    	return tint();
+    }
+    // case add(AExpr ex1, AExpr ex2): {
+    //   if((typeOf(ex1, tenv, useDef) == tint()) 
+    //    && (typeOf(ex2, tenv, useDef) == tint())){
+    //  	return tint();
+    //  } else {
+    //  	return tunknown();
+    //  }
+    //}
+    case subtract(AExpr expr1, AExpr expr2): {
+    	return tint();
+    }
+    case less(AExpr expr1, AExpr expr2): {
+    	return tbool();
+    }
+    case gtr(AExpr expr1, AExpr expr2): {
+    	return tbool();
+    }
+    case leq(AExpr expr1, AExpr expr2): {
+    	return tbool();
+    }
+    case geq(AExpr expr1, AExpr expr2): {
+    	return tbool();
+    }
+    case eq(AExpr expr1, AExpr expr2): {
+    	return tbool();
+    }
+    case neq(AExpr expr1, AExpr expr2): {
+    	return tbool();
+    }
+    case and(AExpr expr1, AExpr expr2): {
+    	return tbool();
+    }
+    case or(AExpr expr1, AExpr expr2): {
+    	return tbool();
+    }
+    case ref(str x, src = loc u):  
+      if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
+        return t;
+      }
     case integer(int n):
       return tint();
     case boolean(str \bool):
