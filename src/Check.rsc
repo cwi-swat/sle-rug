@@ -44,20 +44,19 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef){
 
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 	set[Message] msgs = {};
-	// msgs += error("test", q.src);
-	// same label different
 	// obtain label
 	str label;
-	for(/question(str l, _, _, _) := q){
+	Type tp;
+	list[AExpr] aexpr = [];
+	for(/question(str l, _, AType t, list[AExpr] axprs) := q){
 		label = l;
+		tp = AType2Type(t);
+		aexpr = axprs;
 	}
-	
 	// same label twice
-	i = 0;
-	for(/<_, _, label, _> := tenv){
-		i += 1;
-	}
-	if(i > 1){
+	list[str] labels = [label | /<_, _, label, _> := tenv];
+	
+	if(labels != [label]){
 		msgs += warning("<q.src>" + "Duplicate label");
 	}
 	
@@ -66,12 +65,14 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 	if(types != {AType2Type(q.\type)}){
 		msgs += error("<q.src>" + "Same label, different type");
 	}
-	// TODO: type of question does not match type of expression
-	// set[Type] types = {};
 	
-	
-	// idea: pattern match q.name on tenv
-	// throw error if more than one result
+	// type of expression != type of question
+	if(aexpr != []){
+		Type etp = typeOf(aexpr[0], tenv, useDef);
+		if(etp != tunknown() && etp != tp){
+			msgs += error("<q.src>" + "Type of expression does not match type of question");
+		}
+	}
 	return msgs;
 }
 
