@@ -61,7 +61,7 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 	}
 	
 	// same label, different types
-	set[Type] types = {AType2Type(t) | /question(label, _, AType t, _) := q};
+	set[Type] types = {t | <_, _, label, Type t> := tenv};
 	if(types != {AType2Type(q.\type)}){
 		msgs += error("<q.src>" + "Same label, different type");
 	}
