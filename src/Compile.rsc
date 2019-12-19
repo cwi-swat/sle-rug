@@ -20,11 +20,42 @@ import lang::html5::DOM; // see standard library
 
 void compile(AForm f) {
   writeFile(f.src[extension="js"].top, form2js(f));
-  writeFile(f.src[extension="html"].top, toString(form2html(f)));
+  writeFile(f.src[extension="html"].top, "\<!doctype html\>\n" + toString(form2html(f)));
 }
 
 HTML5Node form2html(AForm f) {
-  return html();
+  HEAD = head(title(f.name));
+  BODY = body(
+    form([form2html(question) | question <- f.questions] + [input(\type("submit"), \value("Submit"))]));
+  return html([HEAD, BODY]);
+}
+
+HTML5Node form2html(AQuestion q) {
+  switch(q){
+  	case question(str question, AId identifier, AType t, list[AExpr] expr): {
+  		divargs = [class("question"), id(identifier.name)] + [
+  			question];
+  		if(expr != []){
+  			divargs += [hidden("true")];
+  		}
+  		
+  		if(t.\type == "boolean"){
+  		  divargs += [input(\type("radio"), name(identifier.name), \value("true"), checked("true")), 
+  			"True",
+  			input(\type("radio"), name(identifier.name), \value("false")), 
+  			"False"
+  			];
+  		} else if (t.\type == "integer"){
+  		  divargs += [input(\type("number"), name(identifier.name))];
+  		} else if (t.\type == "string"){
+  		  divargs += [input(\type("text"), name(identifier.name))];
+  		}
+  		return div(divargs);
+  	}
+  	case cond(AExpr c, list[AQuestion] \if, list[AQuestion] \else): {
+  		return div([class("conditition")] + [form2html(h) | h <- \if] + [form2html(h) | h <- \else]);
+  	}
+  };
 }
 
 str form2js(AForm f) {
