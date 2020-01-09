@@ -28,8 +28,37 @@ import AST;
  *
  */
  
+ 
 AForm flatten(AForm f) {
-  return f; 
+	list[AQuestion] aqs = [];
+	for(question <- f.questions){
+		aqs += flatten(question, boolean("true"));
+	}
+	return form(f.name, aqs);
+}
+
+list[AQuestion] flatten(AQuestion question, AExpr condition){
+	switch(question){
+		case question(str q, AId id, AType \type, list[AExpr] expr):{
+			if(boolean("true") == condition){
+				return [question];
+			}
+			else{
+				return [cond(condition, [question], [])];
+			}
+		}
+		case cond(AExpr c, list[AQuestion] \if, list[AQuestion] \else) :{
+			AExpr ifcon = and(c, condition);
+			AExpr elsecon = and(not(c), condition);
+			list[list[AQuestion]] result =  [flatten(qu, ifcon) | qu <- \if] +
+											[flatten(qu, elsecon) | qu <- \else];
+			list[AQuestion] final = [];
+			for(res <- result){
+				final += res;
+			}
+			return final;
+		} 
+	}
 }
 
 /* Rename refactoring:
@@ -39,9 +68,10 @@ AForm flatten(AForm f) {
  *
  */
  
- start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
-   return f; 
- } 
+start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
+	
+	return f; 
+} 
  
  
  
