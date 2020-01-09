@@ -3,6 +3,7 @@ module Compile
 import AST;
 import Resolve;
 import IO;
+import util::Math;
 import lang::html5::DOM; // see standard library
 
 /*
@@ -42,7 +43,7 @@ HTML5Node form2html(AQuestion q) {
   	case question(str question, AId identifier, AType t, list[AExpr] expr): {
   		divargs = [class("question")];
   		if(expr != []){
-  			divargs += [id(identifier.name), html5attr("expr", pretty_print(expr))];
+  			divargs += [id(identifier.name), html5attr("expr", pretty_print(expr[0]))];
   			if(t.\type == "boolean"){
   			  divargs += [html5attr("data-value", "false")];
   		  } else if (t.\type == "integer"){
@@ -84,7 +85,7 @@ str pretty_print(AExpr c){
 		case neq(AExpr ex1, AExpr ex2): return "(<pretty_print(ex1)>) != (<pretty_print(ex1)>)";
 		case and(AExpr ex1, AExpr ex2): return "(<pretty_print(ex1)>) && (<pretty_print(ex1)>)";
 		case or(AExpr ex1, AExpr ex2): return "(<pretty_print(ex1)>) || (<pretty_print(ex1)>)";
-		case ref(AId id): return "(document.getElementById(<id.name>).value)";
+		case ref(AId id): return "(document.getElementById(\"<id.name>\").value)";
 		case integer(int n): return toString(n);
 		case boolean(str \bool): return \bool;
 	}
@@ -199,7 +200,7 @@ str visibilityHelper(list[AQuestion] li){
 	for(q <- li){
 		switch(q){
 			case cond(AExpr c, list[AQuestion] \if, list[AQuestion] \else): {
-				result += "if ( eval(" + "<pretty_print(c)>" + ")) {\n";
+				result += "if ( eval(<pretty_print(c)>)) {\n";
   				result += "<visibilityHelper(\if)>\n";
   				result += "}\n";
   				if(\else != []){
