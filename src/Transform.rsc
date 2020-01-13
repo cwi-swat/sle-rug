@@ -69,6 +69,12 @@ list[AQuestion] flatten(AQuestion question, AExpr condition){
  */
  
 start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
+	//locations -> usedef
+	//find all locations
+	UseDef required = {<ud.use, ud.def> | ud <- useDef && (ud.use == useOrDef || ud.def == useOrDef)};
+	
+	
+	//create a new form with the respective locations renamed
 	
 	return f; 
 } 

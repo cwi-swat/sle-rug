@@ -5,6 +5,8 @@ import Resolve;
 import IO;
 import util::Math;
 import lang::html5::DOM; // see standard library
+import math;
+import String;
 
 /*
  * Implement a compiler for QL to HTML and Javascript
@@ -30,7 +32,7 @@ HTML5Node form2html(AForm f) {
   filename = src(f.src[extension="js"].top.path[10..]);
   
   HEAD = head([meta(charset("UTF-8")), title(f.name), script(filename)]);
-  BODY = body(
+  BODY = body(onload("ev(); updateVisibility();"),
     		form([onsubmit("return false")] + [form2html(question) | question <- f.questions] +
     			[input(\type("submit"), \value("Submit"), onclick("onSubmit();"))]),
     		p(id("output"))
@@ -43,7 +45,8 @@ HTML5Node form2html(AQuestion q) {
   	case question(str question, AId identifier, AType t, list[AExpr] expr): {
   		divargs = [class("question")];
   		if(expr != []){
-  			divargs += [id(identifier.name), html5attr("expr", pretty_print(expr[0]))];
+  			divargs += [id(identifier.name), html5attr("expr", escape_quotes(pretty_print(expr[0])))];
+
   			if(t.\type == "boolean"){
   			  divargs += [html5attr("data-value", "false")];
   		  } else if (t.\type == "integer"){
@@ -54,7 +57,7 @@ HTML5Node form2html(AQuestion q) {
   		} else {
   		  divargs += [question];
   		  if(t.\type == "boolean"){
-  			  divargs += [input(\type("checkbox"), id(identifier.name), \value("false"), onchange("ev(); updateVisibility();"))];
+  			  divargs += [input(\type("checkbox"), id(identifier.name), onchange("ev(); updateVisibility();"))];
   		  } else if (t.\type == "integer"){
   		    divargs += [input(\type("number"), id(identifier.name), \value(0), onchange("ev(); updateVisibility();"))];
   		  } else if (t.\type == "string"){
@@ -85,23 +88,82 @@ str pretty_print(AExpr c){
 		case neq(AExpr ex1, AExpr ex2): return "(<pretty_print(ex1)>) != (<pretty_print(ex1)>)";
 		case and(AExpr ex1, AExpr ex2): return "(<pretty_print(ex1)>) && (<pretty_print(ex1)>)";
 		case or(AExpr ex1, AExpr ex2): return "(<pretty_print(ex1)>) || (<pretty_print(ex1)>)";
+
+		case ref(AId id): return "(getValue(\"<id.name>\"))";
+		case integer(int n): {
+			
+			return intToStr(n);		
+			//return toString(n);
+			// toString(1) seems to bug out, defining own function
+		}
+
 		case ref(AId id): return "(document.getElementById(\"<id.name>\").value)";
 		case integer(int n): return toString(n);
 		case boolean(str \bool): return \bool;
 	}
 }
 
+str intToStr(int n){
+	if(n >= 10){
+		return intToStr(n / 10) + intToStr(n % 10);
+	}
+	if(n == 0){
+		return "0";
+	}
+	if(n == 1){
+		return "1";
+	}
+	if(n == 2){
+		return "2";
+	}
+	if(n == 3){
+		return "3";
+	}
+	if(n == 4){
+		return "4";
+	}
+	if(n == 5){
+		return "5";
+	}
+	if(n == 6){
+		return "6";
+	}
+	if(n == 7){
+		return "7";
+	}
+	if(n == 8){
+		return "8";
+	}
+	if(n == 9){
+		return "9";
+	}
+	return "";
+}
+
+str escape_quotes(str code){
+	str result = "";
+	for(i<-[0..size(code)]){
+		if(code[i] == "\""){
+			result += "&quot;";
+		} else {
+			result += code[i];
+		}
+	}
+	return result;
+}
+
 str form2js(AForm f) {	
-	return "<genIds(f)>\n" +
-	"<onSubmit(f)>\n" + 
+	return "<gen_ids(f)>\n" +
+	"<on_submit(f)>\n" + 
 	"<evaluate()>\n" + 
 	"<evaluateOnce()>\n" + 
-	"<getValue()>\n" + 
-	"<updateVisibility(f)>\n";
+	"<recalculate()>\n" + 
+	"<get_value()>\n" +
+	"<update_visibility(f)>\n";
 }
 
 //- global list of question ids
-str genIds(AForm f){
+str gen_ids(AForm f){
 	ids = "var ids = [";
 	for(/question(_, id, _, _) := f){
 		ids += "\"" + id.name + "\"" + ",";
@@ -109,7 +171,7 @@ str genIds(AForm f){
 	return ids + "];\n";
 }
 
-str onSubmit(AForm f){
+str on_submit(AForm f){
 	result = "function onSubmit(){\n" +
 	"\tvar result = \"\";\n" +
 	"\tfor(var i in ids){\n" +
@@ -120,7 +182,7 @@ str onSubmit(AForm f){
 	"\t\t} else if(em.type == \"checkbox\"){\n" +
   	"\t\t\tresult += ids[i] + \" : \" + em.checked + \"\\n\"\n" +
 	"\t\t} else if((! em.hasAttribute(\"class\")) && em.visible){\n" +
-	"\t\t\tresult += ids[i] + \" : \" + em.value + \"\\n\";\n" +
+	"\t\t\tresult += ids[i] + \" : \" + getValue(ids[i]) + \"\\n\";\n" +
 	"\t\t}\n" +
 	"\t}\n" +
 	"\tdocument.getElementById(\"output\").innerHTML = result;\n" +
@@ -153,22 +215,32 @@ str evaluateOnce(){
 		"}\n";
 }
 
-str getValue(){
+str recalculate(){
 	return "function recalculate(id){\n" +
 		"\tvar em = document.getElementById(id);\n" +
 		"\tif(em.hasAttribute(\"expr\")) {\n" +
-		"\t\tvar value = eval(em.expr);\n" +
+		"\t\tvar value = eval(em.getAttribute(\"expr\"));\n" +
 		"\t\tem.setAttribute(\"data-value\", value);\n" +
 		"\t\treturn value;\n" +
 		"\t}\n"+
-		"\tif(em.type == \"checkbox\"){\n" +
-  		"\t\treturn em.checked;\n" +
-		"\t}\n" +
-		"\treturn em.value;\n" +
+		"\treturn getValue(id);\n" +
 		"}\n";
 }
 
-str updateVisibility(AForm f){
+str get_value(){
+	return "function getValue(id){\n" +
+		"\tem = document.getElementById(id);\n" +
+		"\tif(em.hasAttribute(\"data-value\")){\n" +
+		"\t\treturn em.getAttribute(\"data-value\");\n" +
+		"\t} else if(em.hasAttribute(\"type\") && em.type == \"checkbox\"){\n" +
+		"\t\treturn em.checked;\n" +
+		"\t} else {\n" +
+		"\t\treturn em.value;\n" +
+		"\t}\n" +
+		"}\n";
+}
+
+str update_visibility(AForm f){
 	return "function updateVisibility(){\n" +
 		"\t// mark every element as not visible\n" +
 		"\tfor(i in ids){\n" +
