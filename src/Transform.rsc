@@ -3,6 +3,8 @@ module Transform
 import Syntax;
 import Resolve;
 import AST;
+import IO;
+import Tree;
 
 /* 
  * Transforming QL forms
@@ -28,8 +30,37 @@ import AST;
  *
  */
  
+ 
 AForm flatten(AForm f) {
-  return f; 
+	list[AQuestion] aqs = [];
+	for(question <- f.questions){
+		aqs += flatten(question, boolean("true"));
+	}
+	return form(f.name, aqs);
+}
+
+list[AQuestion] flatten(AQuestion question, AExpr condition){
+	switch(question){
+		case question(str q, AId id, AType \type, list[AExpr] expr):{
+			if(boolean("true") == condition){
+				return [question];
+			}
+			else{
+				return [cond(condition, [question], [])];
+			}
+		}
+		case cond(AExpr c, list[AQuestion] \if, list[AQuestion] \else) :{
+			AExpr ifcon = and(c, condition);
+			AExpr elsecon = and(not(c), condition);
+			list[list[AQuestion]] result =  [flatten(qu, ifcon) | qu <- \if] +
+											[flatten(qu, elsecon) | qu <- \else];
+			list[AQuestion] final = [];
+			for(res <- result){
+				final += res;
+			}
+			return final;
+		} 
+	}
 }
 
 /* Rename refactoring:
@@ -39,9 +70,22 @@ AForm flatten(AForm f) {
  *
  */
  
- start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
-   return f; 
- } 
+start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
+	//locations -> usedef
+	//find all locations
+	//print("\n");
+	set[loc] locations = {};
+	locations += {useOrDef};
+	locations += {ud.use | ud <- useDef && ud.def == useOrDef};
+	locations += {ud.def | ud <- useDef && ud.use == useOrDef};
+	
+	//print(locations);
+	print("\n...............");
+	//create a new form with the respective locations renamed
+	print(f.top.questions);
+	print("\n");
+	return f; 
+} 
  
  
  

@@ -8,29 +8,52 @@ extend lang::std::Id;
  */
 
 start syntax Form 
-  = "form" Id "{" Question* "}"; 
+  = "form" Id name "{" Question* questions "}"; 
 
 // TODO: question, computed question, block, if-then-else, if-then
-syntax Question
-  = 
+syntax Question 
+  = Str Id ":" Type ( "=" Expr )?
+  | "if" "(" Expr ")" "{" Question* "}" 
+  | "if" "(" Expr ")" "{" Question* "}" "else" "{" Question* "}" 
   ; 
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
 // and use C/Java style precedence rules (look it up on the internet)
 syntax Expr 
-  = Id \ "true" \ "false" // true/false are reserved keywords.
+  = "(" Expr ")"
+  | "!" Expr
+  > non-assoc (Expr "/" Expr
+  | Expr "*" Expr)
+  > non-assoc (Expr "+" Expr
+  | Expr "-" Expr)
+  > non-assoc (Expr "\<" Expr
+  | Expr "\>" Expr
+  | Expr "\<=" Expr
+  | Expr "\>=" Expr)
+  > non-assoc (Expr "==" Expr
+  | Expr "!=" Expr)
+  > left Expr "&&" Expr
+  > left Expr "||" Expr
+  >  Id \ "true" \ "false" // true/false are reserved keywords.
+  | Int
+  | Bool
   ;
   
 syntax Type
-  = ;  
+  = "boolean"
+  | "integer"
+  ;  
   
-lexical Str = ;
+lexical Str = "\""([0-9 A-Z _ a-z]|" ")*[? :]? "\"" ;
 
 lexical Int 
-  = ;
+  = [0-9]*;
 
-lexical Bool = ;
+lexical Bool 
+	= "true"
+	| "false"
+	;
 
 
 
