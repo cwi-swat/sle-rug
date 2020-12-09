@@ -51,7 +51,7 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
 
 Value eval(AExpr e, VEnv venv) {
   switch (e) {
-    case ref(str x): return venv[x];
+    case ref(id(str x)): return venv[x];
     
     // etc.
     
