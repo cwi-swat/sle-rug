@@ -13,7 +13,7 @@ This page: [https://cwi-swat.github.io/sle-rug/](https://cwi-swat.github.io/sle-
 
 Book: *Software Languages: Syntax, Semantics, and Metaprogramming*, by Ralf L&auml;mmel. The book is for sale here: [Springer](https://www.springer.com/gp/book/9783319907987), [Amazon](https://www.amazon.de/Software-Languages-Syntax-Semantics-Metaprogramming/dp/3319907980) *FREE E-book*: [https://rug.on.worldcat.org/oclc/1036771828](https://rug.on.worldcat.org/oclc/1036771828).
 
-Detailed schedule: [rooster.rug.nl](https://rooster.rug.nl/#/nl/2020-2021/course/WBCS016-05/timeRange=all)
+Detailed schedule: [rooster.rug.nl](https://rooster.rug.nl/#/nl/2021-2022/schedule/course-WBCS016-05/timeRange=all)
 
 - Week 1: Introduction (Chapters 1 & 2)
 - Week 2: Concrete syntax (Chapters 6 & 7)
@@ -23,8 +23,6 @@ Detailed schedule: [rooster.rug.nl](https://rooster.rug.nl/#/nl/2020-2021/course
 - Week 6: Code generation (Chapter 5)
 - Week 7: Transformation (Chapters 5 & 12)
 - Week 8: Wrap up & grading of lab starts
-
-Due to the situation with Covid19, the course will be taught fully online, and the exam will be open book.
 
 ### Lab
 
