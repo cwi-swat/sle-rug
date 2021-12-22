@@ -3,6 +3,7 @@ module Check
 import AST;
 import Resolve;
 import Message; // see standard library
+import IO;
 
 data Type
   = tint()
@@ -16,19 +17,72 @@ alias TEnv = rel[loc def, str name, str label, Type \type];
 
 // To avoid recursively traversing the form, use the `visit` construct
 // or deep match (e.g., `for (/question(...) := f) {...}` ) 
-TEnv collect(AForm f) {
-  return {}; 
+TEnv collect(AForm f) { //Taking wrong SRC of id instead of Question
+	TEnv tenv =  {};
+	for(/q:question(str label, AId id, AType typ) := f) {
+		switch(typ) {
+			case var("string"): tenv += {<q.src, label, id.name, tstr()>};
+			case var("boolean"): tenv += {<q.src, label, id.name, tbool()>};
+			case var("integer"): tenv += {<q.src, label, id.name, tint()>};
+			default: tenv += {<q.src, id.name, label, tunknown()>};			
+		};
+	};
+		
+	for(/q:guarded(str label, AId id, AType typ,_) := f) {
+		switch(typ) {
+			case var("string"): tenv += {<q.src, label, id.name, tstr()>};
+			case var("boolean"): tenv += {<q.src, label, id.name, tbool()>};
+			case var("integer"): tenv += {<q.src, label, id.name, tint()>};
+			default: tenv += {<q.src, id.name, label, tunknown()>};			
+		};
+	};
+  return tenv; 
 }
 
 set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
-  return {}; 
+	set[Message] msgs = {};
+	for(/q:question(_,_,_) := f) {
+		msgs += check(q, tenv, useDef);
+	};	
+	
+	for(/q:guarded(_,_,_,_) := f) {
+		msgs += check(q, tenv, useDef);
+	};
+	
+	for(/q:guarded(AExpr condition, list[AQuestion] _) := f) {
+		msgs += { error("Condition should be boolean", condition.src) | tbool() != typeOf(condition, tenv, useDef)}
+			 + check(condition, tenv, useDef);	
+ 	};
+ 	
+	for(/q:guarded(AExpr condition, list[AQuestion] _, list[AQuestion] _) := f) {
+		msgs += { error("Condition should be boolean", condition.src) | tbool() != typeOf(condition, tenv, useDef)}
+			 + check(condition, tenv, useDef);	
+ 	};
+  return msgs; 
 }
 
 // - produce an error if there are declared questions with the same name but different types.
 // - duplicate labels should trigger a warning 
 // - the declared type computed questions should match the type of the expression.
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
-  return {}; 
+	set[Message] msgs = {};
+	for(<d, label, name, Type t> <- tenv) {
+		if(q.id.name == name && typeOf(q.typ) != t) {
+			msgs += { error("Question with double name, but different type", d) };
+		};
+		
+		if(q.label == label && q.id.name != name) {
+			msgs += { warning("Duplicate label", d) };
+		};
+	};
+	
+	switch(q) {
+		case guarded(_, _, AType typ, AExpr expr):
+			msgs += { error("Declared type does not match type of expression", expr.src) | typeOf(typ) != typeOf(expr, tenv, useDef)}
+				 + check(expr, tenv, useDef);	
+	};
+
+  return msgs; 
 }
 
 // Check operand compatibility with operators.
@@ -40,8 +94,32 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
   switch (e) {
     case ref(AId x):
       msgs += { error("Undeclared question", x.src) | useDef[x.src] == {} };
-
-    // etc.
+    case not(AExpr _):
+      msgs += { error("Can only do not for boolean", e.src) | typeOf(e, tenv, useDef) != tbool() };
+    case multi(AExpr _, AExpr _):
+      msgs += { error("Can only multiply integers", e.src) | typeOf(e, tenv, useDef) != tint() };
+    case div(AExpr _, AExpr _):
+      msgs += { error("Can only divide integers", e.src) | typeOf(e, tenv, useDef) != tint() };
+    case plus(AExpr _, AExpr _):
+      msgs += { error("Can only add integers", e.src) | typeOf(e, tenv, useDef) != tint() };
+    case min(AExpr _, AExpr _):
+      msgs += { error("Can only minus integers", e.src) | typeOf(e, tenv, useDef) != tint() };
+    case less(AExpr _, AExpr _):
+      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tbool() };
+    case leq(AExpr _, AExpr _):
+      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tbool() };
+    case great(AExpr _, AExpr _):
+      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tbool() };
+    case geq(AExpr _, AExpr _):
+      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tbool() };
+    case neq(AExpr _, AExpr _):
+      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tint()};
+    case eql(AExpr _, AExpr _):
+      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tint()};
+    case and(AExpr _, AExpr _):
+      msgs += { error("Can only && boolean", e.src) | typeOf(e, tenv, useDef) != tbool() };
+    case or(AExpr _, AExpr _):
+      msgs += { error("Can only || boolean", e.src) | typeOf(e, tenv, useDef) != tbool() };
   }
   
   return msgs; 
@@ -53,11 +131,52 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
       if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
         return t;
       }
-    // etc.
+    case ref(AStr _): return tstr();
+    case ref(AInt _): return tint();
+    case ref(ABool _): return tbool();
+    case not(AExpr expr): return typeOf(expr, tenv, useDef);
+    case multi(AExpr lhs, AExpr rhs): return typeOf(lhs, rhs, tenv, useDef);
+    case div(AExpr lhs, AExpr rhs): return typeOf(lhs, rhs, tenv, useDef);
+    case plus(AExpr lhs, AExpr rhs): return typeOf(lhs, rhs, tenv, useDef);
+    case min(AExpr lhs, AExpr rhs): return typeOf(lhs, rhs, tenv, useDef);
+    
+    case less(AExpr lhs, AExpr rhs): return typeOfCom(lhs, rhs, tenv, useDef);
+    case leq(AExpr lhs, AExpr rhs): return typeOfCom(lhs, rhs, tenv, useDef);
+    case great(AExpr lhs, AExpr rhs): return typeOfCom(lhs, rhs, tenv, useDef);
+    case geq(AExpr lhs, AExpr rhs): return typeOfCom(lhs, rhs, tenv, useDef);
+    case neq(AExpr lhs, AExpr rhs): return typeOfCom(lhs, rhs, tenv, useDef);
+    case eql(AExpr lhs, AExpr rhs): return typeOfCom(lhs, rhs, tenv, useDef);
+    
+    case and(AExpr lhs, AExpr rhs): return typeOf(lhs, rhs, tenv, useDef);
+    case or(AExpr lhs, AExpr rhs): return typeOf(lhs, rhs, tenv, useDef);
   }
   return tunknown(); 
 }
 
+Type typeOf(AExpr lhs, AExpr rhs, TEnv tenv, UseDef useDef) {
+	Type temp = typeOf(lhs, tenv, useDef);
+	if(temp == typeOf(rhs, tenv, useDef)) {
+		return temp;
+	};
+	return tunknown();
+}
+
+Type typeOfCom(AExpr lhs, AExpr rhs, TEnv tenv, UseDef useDef) {
+	Type temp = typeOf(lhs, tenv, useDef);
+	if(temp == typeOf(rhs, tenv, useDef) || temp == tint()) {
+		return tbool();
+	};
+	return tunknown();
+}
+
+Type typeOf(AType typ) {
+	switch(typ) {
+		case var("string"): return tstr();
+		case var("boolean"): return tbool();
+		case var("integer"): return tint();
+		default: return tunknown();
+	};
+}
 /* 
  * Pattern-based dispatch style:
  * 
@@ -69,6 +188,3 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
  * default Type typeOf(AExpr _, TEnv _, UseDef _) = tunknown();
  *
  */
- 
- 
-
