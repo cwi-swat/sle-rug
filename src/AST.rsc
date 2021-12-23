@@ -14,16 +14,16 @@ data AForm(loc src = |tmp:///|)
 
 data AQuestion(loc src = |tmp:///|)
   = question(str label, AId id, AType typ)
-  | guarded(str label, AId id, AType typ, AExpr expr)
-  | guarded(AExpr condition, list[AQuestion] questions)
-  | guarded(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec)
+  | computed(str label, AId id, AType typ, AExpr expr)
+  | ifblock(AExpr condition, list[AQuestion] questions)
+  | ifelseblock(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec)
   ;
 
 data AExpr(loc src = |tmp:///|)
   = ref(AId id)
-  | ref(AStr string)
-  | ref(AInt integer)
-  | ref(ABool boolean)
+  | strConst(str s)
+  | intConst(int n)
+  | boolConst(bool b)
   | not(AExpr expr)
   | multi(AExpr lhs, AExpr rhs)
   | div(AExpr lhs, AExpr rhs)
@@ -43,13 +43,7 @@ data AId(loc src = |tmp:///|)
   = id(str name);
 
 data AType(loc src = |tmp:///|)
-  = var(str name);	
-  
-data AStr(loc src = |tmp:///|)
-  = string(str string);  
-  
-data AInt(loc src = |tmp:///|)
-  = integer(int integer);
-
-data ABool(loc src = |tmp:///|)
-  = boolean(bool boolean);
+  = string()
+  | integer()
+  | boolean()
+  ;

@@ -3,7 +3,6 @@ module Check
 import AST;
 import Resolve;
 import Message; // see standard library
-import IO;
 
 data Type
   = tint()
@@ -21,18 +20,18 @@ TEnv collect(AForm f) { //Taking wrong SRC of id instead of Question
 	TEnv tenv =  {};
 	for(/q:question(str label, AId id, AType typ) := f) {
 		switch(typ) {
-			case var("string"): tenv += {<q.src, label, id.name, tstr()>};
-			case var("boolean"): tenv += {<q.src, label, id.name, tbool()>};
-			case var("integer"): tenv += {<q.src, label, id.name, tint()>};
+			case string(): tenv += {<q.src, label, id.name, tstr()>};
+			case boolean(): tenv += {<q.src, label, id.name, tbool()>};
+			case integer(): tenv += {<q.src, label, id.name, tint()>};
 			default: tenv += {<q.src, id.name, label, tunknown()>};			
 		};
 	};
 		
-	for(/q:guarded(str label, AId id, AType typ,_) := f) {
+	for(/q:computed(str label, AId id, AType typ,_) := f) {
 		switch(typ) {
-			case var("string"): tenv += {<q.src, label, id.name, tstr()>};
-			case var("boolean"): tenv += {<q.src, label, id.name, tbool()>};
-			case var("integer"): tenv += {<q.src, label, id.name, tint()>};
+			case string(): tenv += {<q.src, label, id.name, tstr()>};
+			case boolean(): tenv += {<q.src, label, id.name, tbool()>};
+			case integer(): tenv += {<q.src, label, id.name, tint()>};
 			default: tenv += {<q.src, id.name, label, tunknown()>};			
 		};
 	};
@@ -45,16 +44,16 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
 		msgs += check(q, tenv, useDef);
 	};	
 	
-	for(/q:guarded(_,_,_,_) := f) {
+	for(/q:computed(_,_,_,_) := f) {
 		msgs += check(q, tenv, useDef);
 	};
 	
-	for(/q:guarded(AExpr condition, list[AQuestion] _) := f) {
+	for(/q:ifblock(AExpr condition, list[AQuestion] _) := f) {
 		msgs += { error("Condition should be boolean", condition.src) | tbool() != typeOf(condition, tenv, useDef)}
 			 + check(condition, tenv, useDef);	
  	};
  	
-	for(/q:guarded(AExpr condition, list[AQuestion] _, list[AQuestion] _) := f) {
+	for(/q:ifelseblock(AExpr condition, list[AQuestion] _, list[AQuestion] _) := f) {
 		msgs += { error("Condition should be boolean", condition.src) | tbool() != typeOf(condition, tenv, useDef)}
 			 + check(condition, tenv, useDef);	
  	};
@@ -77,7 +76,7 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 	};
 	
 	switch(q) {
-		case guarded(_, _, AType typ, AExpr expr):
+		case computed(_, _, AType typ, AExpr expr):
 			msgs += { error("Declared type does not match type of expression", expr.src) | typeOf(typ) != typeOf(expr, tenv, useDef)}
 				 + check(expr, tenv, useDef);	
 	};
@@ -128,12 +127,12 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
   switch (e) {
     case ref(id(_, src = loc u)):  
-      if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
+      if (<u, loc d> <- useDef, <d, _, _, Type t> <- tenv) {
         return t;
       }
-    case ref(AStr _): return tstr();
-    case ref(AInt _): return tint();
-    case ref(ABool _): return tbool();
+    case strConst(_): return tstr();
+    case intConst(_): return tint();
+    case boolConst(_): return tbool();
     case not(AExpr expr): return typeOf(expr, tenv, useDef);
     case multi(AExpr lhs, AExpr rhs): return typeOf(lhs, rhs, tenv, useDef);
     case div(AExpr lhs, AExpr rhs): return typeOf(lhs, rhs, tenv, useDef);
@@ -171,9 +170,9 @@ Type typeOfCom(AExpr lhs, AExpr rhs, TEnv tenv, UseDef useDef) {
 
 Type typeOf(AType typ) {
 	switch(typ) {
-		case var("string"): return tstr();
-		case var("boolean"): return tbool();
-		case var("integer"): return tint();
+		case string(): return tstr();
+		case boolean(): return tbool();
+		case integer(): return tint();
 		default: return tunknown();
 	};
 }
