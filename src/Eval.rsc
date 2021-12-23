@@ -2,6 +2,7 @@ module Eval
 
 import AST;
 import Resolve;
+import IO;
 
 /*
  * Implement big-step semantics for QL
@@ -54,14 +55,29 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
   }
 }
 
-VEnv evalOnce(AForm f, Input inp, VEnv venv) { //Right like this?
-	for(/q:question(_,_,_) := f) {
+VEnv evalOnce(AForm f, Input inp, VEnv venv) {
+	for(q:question(_,_,_) <- f.questions) {
 		venv = eval(q, inp, venv);
 	};
 	
-	for(/computed(_,AId id,_,AExpr expr) <- f.questions) {
+	for(computed(_,AId id,_,AExpr expr) <- f.questions) {
 		venv[id.name] = eval(expr, venv);
 	};
+	
+	for(ifblock(AExpr condition, list[AQuestion] questions) <- f.questions) {
+		if(eval(condition, venv).b) {
+			venv = evalOnce(form("", questions), inp, venv);
+		}
+	}
+	
+	for(/ifelseblock(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec) <- f.questions) {
+		if(eval(condition, venv).b) {
+			venv = evalOnce(form("", questions), inp, venv);
+		} else {
+			venv = evalOnce(form("", questionsSec), inp, venv);	
+		}
+	}
+  
   return venv; 
 }
 

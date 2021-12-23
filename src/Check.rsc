@@ -3,6 +3,7 @@ module Check
 import AST;
 import Resolve;
 import Message; // see standard library
+import IO;
 
 data Type
   = tint()
@@ -48,14 +49,17 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
 		msgs += check(q, tenv, useDef);
 	};
 	
-	for(/q:ifblock(AExpr condition, list[AQuestion] _) := f) {
+	for(/ifblock(AExpr condition, list[AQuestion] _) := f) {
 		msgs += { error("Condition should be boolean", condition.src) | tbool() != typeOf(condition, tenv, useDef)}
 			 + check(condition, tenv, useDef);	
  	};
  	
-	for(/q:ifelseblock(AExpr condition, list[AQuestion] _, list[AQuestion] _) := f) {
+	for(/ifelseblock(AExpr condition, list[AQuestion] _, list[AQuestion] _) := f) {
 		msgs += { error("Condition should be boolean", condition.src) | tbool() != typeOf(condition, tenv, useDef)}
 			 + check(condition, tenv, useDef);	
+		if(typeOf(condition, tenv, useDef) != tbool()) {
+			println(typeOf(condition, tenv, useDef));
+		};
  	};
   return msgs; 
 }
@@ -112,9 +116,9 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
     case geq(AExpr _, AExpr _):
       msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tbool() };
     case neq(AExpr _, AExpr _):
-      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tint()};
+      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tbool()};
     case eql(AExpr _, AExpr _):
-      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tint()};
+      msgs += { error("Can only compare integers", e.src) | typeOf(e, tenv, useDef) != tbool()};
     case and(AExpr _, AExpr _):
       msgs += { error("Can only && boolean", e.src) | typeOf(e, tenv, useDef) != tbool() };
     case or(AExpr _, AExpr _):
@@ -126,7 +130,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 
 Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
   switch (e) {
-    case ref(id(_, src = loc u)):  
+    case ref(id(a, src = loc u)):  
       if (<u, loc d> <- useDef, <d, _, _, Type t> <- tenv) {
         return t;
       }
@@ -162,7 +166,7 @@ Type typeOf(AExpr lhs, AExpr rhs, TEnv tenv, UseDef useDef) {
 
 Type typeOfCom(AExpr lhs, AExpr rhs, TEnv tenv, UseDef useDef) {
 	Type temp = typeOf(lhs, tenv, useDef);
-	if(temp == typeOf(rhs, tenv, useDef) || temp == tint()) {
+	if(temp == typeOf(rhs, tenv, useDef) && temp == tint()) {
 		return tbool();
 	};
 	return tunknown();
