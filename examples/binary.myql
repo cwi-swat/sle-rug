@@ -9,7 +9,7 @@ form binary {
         if (x_1_2) { 
           "The answer is" answer_1_2: integer = (1)
         }
-        else {
+        else { 
           "The answer is" answer_2_3: integer = (2)
         }
       }
@@ -98,7 +98,7 @@ form binary {
         }
         else { 
           "Is the number between 18 and 19" x_18_19: boolean
-          if (x_18_19) {
+          if (x_18_19) { 
             "The answer is" answer_18_19: integer = (18)
           }
           else { 
