@@ -83,14 +83,14 @@ HTML5Node computed2form(AQuestion qs) {
 
 str form2js(AForm f) {
   return "function run() {
-  '	var form = document.querySelector(\'form\');
-  '	form.addEventListener(\'change\', function() {
+  '	var $form = document.querySelector(\'form\');
+  '	$form.addEventListener(\'change\', function() {
   '	<for(/c:computed(str label, AId id, AType typ, AExpr e) := f) {>
   '		<computed2js(c)> <}> 	
   ' 
   '		<hide2js(f.questions)>  
   '	});
-  ' form.dispatchEvent(new Event(\'change\'));
+  ' $form.dispatchEvent(new Event(\'change\'));
   '}";
 }
 

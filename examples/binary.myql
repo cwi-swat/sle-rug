@@ -16,7 +16,7 @@ form binary {
       else { 
         "Is the number between 3 and 4" x_3_4: boolean
         if (x_3_4) { 
-          "The answer is" answer_3_4: integer = (3)
+          "The answer is" answer_4_4: integer = (3)
         }
         else { 
           "The answer is" answer_4_5: integer = (4)
@@ -83,7 +83,7 @@ form binary {
     else { 
       "Is the number between 15 and 17" x_15_17: boolean
       if (x_15_17) { 
-        "Is the number between 15 and 16" x_15_16: boolean
+        "Is the number between 15 and 16" x_15_16: boolean = x_15_17
         if (x_15_16) { 
           "The answer is" answer_15_16: integer = (15)
         }

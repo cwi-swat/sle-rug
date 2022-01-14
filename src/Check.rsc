@@ -17,23 +17,23 @@ alias TEnv = rel[loc def, str name, str label, Type \type];
 
 // To avoid recursively traversing the form, use the `visit` construct
 // or deep match (e.g., `for (/question(...) := f) {...}` ) 
-TEnv collect(AForm f) { //Taking wrong SRC of id instead of Question
+TEnv collect(AForm f) {
 	TEnv tenv =  {};
-	for(/q:question(str label, AId id, AType typ) := f) {
+	for(/question(str label, AId id, AType typ) := f) {
 		switch(typ) {
-			case string(): tenv += {<q.src, label, id.name, tstr()>};
-			case boolean(): tenv += {<q.src, label, id.name, tbool()>};
-			case integer(): tenv += {<q.src, label, id.name, tint()>};
-			default: tenv += {<q.src, id.name, label, tunknown()>};			
+			case string(): tenv += {<id.src, label, id.name, tstr()>};
+			case boolean(): tenv += {<id.src, label, id.name, tbool()>};
+			case integer(): tenv += {<id.src, label, id.name, tint()>};
+			default: tenv += {<id.src, id.name, label, tunknown()>};			
 		};
 	};
 		
-	for(/q:computed(str label, AId id, AType typ,_) := f) {
+	for(/computed(str label, AId id, AType typ,_) := f) {
 		switch(typ) {
-			case string(): tenv += {<q.src, label, id.name, tstr()>};
-			case boolean(): tenv += {<q.src, label, id.name, tbool()>};
-			case integer(): tenv += {<q.src, label, id.name, tint()>};
-			default: tenv += {<q.src, id.name, label, tunknown()>};			
+			case string(): tenv += {<id.src, label, id.name, tstr()>};
+			case boolean(): tenv += {<id.src, label, id.name, tbool()>};
+			case integer(): tenv += {<id.src, label, id.name, tint()>};
+			default: tenv += {<id.src, id.name, label, tunknown()>};			
 		};
 	};
   return tenv; 
@@ -57,9 +57,6 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
 	for(/ifelseblock(AExpr condition, list[AQuestion] _, list[AQuestion] _) := f) {
 		msgs += { error("Condition should be boolean", condition.src) | tbool() != typeOf(condition, tenv, useDef)}
 			 + check(condition, tenv, useDef);	
-		if(typeOf(condition, tenv, useDef) != tbool()) {
-			println(typeOf(condition, tenv, useDef));
-		};
  	};
   return msgs; 
 }
@@ -74,7 +71,7 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 			msgs += { error("Question with double name, but different type", d) };
 		};
 		
-		if(q.label == label && q.id.name != name) {
+		if(q.label == label && q.src != q.src) {
 			msgs += { warning("Duplicate label", d) };
 		};
 	};

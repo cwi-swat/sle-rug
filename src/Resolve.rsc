@@ -30,6 +30,6 @@ Use uses(AForm f) {
 }
 
 Def defs(AForm f) {
-  return {<i.name, q.src> | /q:question(str _, AId i, AType _) := f}
-  		+ {<i.name, c.src> | /c:computed(str _, AId i, AType _, AExpr _) := f}; 
+  return {<i.name, i.src> | /question(str _, AId i, AType _) := f}
+  		+ {<i.name, i.src> | /computed(str _, AId i, AType _, AExpr _) := f}; 
 }
