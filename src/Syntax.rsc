@@ -19,8 +19,8 @@ syntax Question
 
 
 syntax Expr 
-  = Id \ "true" \ "false" \ "if" \ "else"
-  | left Str \ "true" \ "false" \ "if" \ "else"
+  = Id \ Reserved
+  | left Str \ Reserved
   | left Int
   | left Bool
   | bracket "(" Expr ")"
@@ -38,6 +38,13 @@ syntax Expr
   > left Expr "&&" Expr
   > left Expr "||" Expr
   ;
+  
+keyword Reserved 
+	= "true"
+	| "false"
+	| "if"
+	| "else"
+	;
   
 syntax Type
   = "boolean"

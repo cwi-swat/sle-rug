@@ -41,23 +41,17 @@ TEnv collect(AForm f) {
 
 set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
 	set[Message] msgs = {};
-	for(/q:question(_,_,_) := f) {
-		msgs += check(q, tenv, useDef);
-	};	
+	visit(f) {
+		case q:question(_,_,_): msgs += check(q, tenv, useDef);
+		case q:computed(_,_,_,_): msgs += check(q, tenv, useDef);
+		case ifblock(AExpr condition, list[AQuestion] _): msgs += { error("Condition should be boolean", condition.src) 
+			| tbool() != typeOf(condition, tenv, useDef)}
+			+ check(condition, tenv, useDef);	
+		case ifelseblock(AExpr condition, list[AQuestion] _, list[AQuestion] _): msgs += { error("Condition should be boolean", condition.src) 
+			| tbool() != typeOf(condition, tenv, useDef)}
+			+ check(condition, tenv, useDef);	
+	}
 	
-	for(/q:computed(_,_,_,_) := f) {
-		msgs += check(q, tenv, useDef);
-	};
-	
-	for(/ifblock(AExpr condition, list[AQuestion] _) := f) {
-		msgs += { error("Condition should be boolean", condition.src) | tbool() != typeOf(condition, tenv, useDef)}
-			 + check(condition, tenv, useDef);	
- 	};
- 	
-	for(/ifelseblock(AExpr condition, list[AQuestion] _, list[AQuestion] _) := f) {
-		msgs += { error("Condition should be boolean", condition.src) | tbool() != typeOf(condition, tenv, useDef)}
-			 + check(condition, tenv, useDef);	
- 	};
   return msgs; 
 }
 
@@ -66,20 +60,23 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
 // - the declared type computed questions should match the type of the expression.
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 	set[Message] msgs = {};
-	for(<d, label, name, Type t> <- tenv) {
-		if(q.id.name == name && typeOf(q.typ) != t) {
-			msgs += { error("Question with double name, but different type", d) };
-		};
-		
-		if(q.label == label && q.src != q.src) {
-			msgs += { warning("Duplicate label", d) };
-		};
-	};
+	str name = q.id.name;
+	str label = q.label;
+	loc loca = q.id.src;
+	Type typQ = typeOf(q.typ);
+
+	if(<d, label, _, _> <- tenv && d != loca)  {
+    	msgs += { warning("Duplicate label", q.src) };
+	}
+	
+	if(<d, _, name, t> <- tenv && typQ != t)  {
+		msgs += { error("Question with double name, but different type", d) };
+	}		
 	
 	switch(q) {
-		case computed(_, _, AType typ, AExpr expr):
-			msgs += { error("Declared type does not match type of expression", expr.src) | typeOf(typ) != typeOf(expr, tenv, useDef)}
-				 + check(expr, tenv, useDef);	
+		case computed(_, _, _, AExpr expr):
+			msgs += { error("Declared type does not match type of expression", expr.src) | typQ != typeOf(expr, tenv, useDef)}
+				 + check(expr, tenv, useDef);
 	};
 
   return msgs; 
@@ -127,7 +124,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 
 Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
   switch (e) {
-    case ref(id(a, src = loc u)):  
+    case ref(id(_, src = loc u)):  
       if (<u, loc d> <- useDef, <d, _, _, Type t> <- tenv) {
         return t;
       }

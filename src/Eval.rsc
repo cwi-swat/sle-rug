@@ -56,25 +56,15 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
 }
 
 VEnv evalOnce(AForm f, Input inp, VEnv venv) {
-	for(q:question(_,_,_) <- f.questions) {
-		venv = eval(q, inp, venv);
-	};
-	
-	for(computed(_,AId id,_,AExpr expr) <- f.questions) {
-		venv[id.name] = eval(expr, venv);
-	};
-	
-	for(ifblock(AExpr condition, list[AQuestion] questions) <- f.questions) {
-		if(eval(condition, venv).b) {
-			venv = evalOnce(form("", questions), inp, venv);
-		}
-	}
-	
-	for(/ifelseblock(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec) <- f.questions) {
-		if(eval(condition, venv).b) {
-			venv = evalOnce(form("", questions), inp, venv);
-		} else {
-			venv = evalOnce(form("", questionsSec), inp, venv);	
+	for(AQuestion q <- f.questions) {
+		switch(q) {
+			case question(_,_,_): venv = eval(q, inp, venv);
+			case computed(_,AId id,_,AExpr expr): venv[id.name] = eval(expr, venv);
+			case ifblock(AExpr condition, list[AQuestion] questions): eval(condition, venv).b ? venv = 
+					evalOnce(form("", questions), inp, venv);
+			case ifelseblock(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec): venv = eval(condition, venv).b ? 
+					evalOnce(form("", questions), inp, venv) : 
+					evalOnce(form("", questionsSec), inp, venv);
 		}
 	}
   

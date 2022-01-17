@@ -31,11 +31,7 @@ import ParseTree;
  */
  
 AForm flatten(AForm f) {	
-	list[AQuestion] qs = [*flattenQs(q, []) | AQuestion q <- f.questions];
-	println(qs);
-  AForm k = form(f.name, qs); 
-  println(k);
-  return k; 
+  return  form(f.name, [*flattenQs(q, []) | AQuestion q <- f.questions]);; 
 }
 
 list[AQuestion] flattenQs(AQuestion q, list[AExpr] exprs) {

@@ -60,9 +60,6 @@ HTML5Node question2html(AQuestion qs) {
 	return p("error");
 }
 
-
-
-
 HTML5Node question2form(AQuestion qs) {
 	switch(qs.typ) {
 		case string(): return div(label(qs.label), input(\type("text"), id(qs.id.name)));
@@ -83,14 +80,22 @@ HTML5Node computed2form(AQuestion qs) {
 
 str form2js(AForm f) {
   return "function run() {
+  ' 	function getBool(b) {
+  '		return String(b) == \'true\' ? true : false;
+  '	}
+  '
+  '	function getBoolOrVal(x) {
+  '		return document.getElementById(x).checked ? true : document.getElementById(x).value;
+  '	}
+  '
   '	var $form = document.querySelector(\'form\');
   '	$form.addEventListener(\'change\', function() {
   '	<for(/c:computed(str label, AId id, AType typ, AExpr e) := f) {>
   '		<computed2js(c)> <}> 	
   ' 
-  '		<hide2js(f.questions)>  
-  '	});
-  ' $form.dispatchEvent(new Event(\'change\'));
+  '		<hide2js(f.questions)>	});
+  '
+  ' 	$form.dispatchEvent(new Event(\'change\'));
   '}";
 }
 
@@ -98,14 +103,14 @@ str computed2js(AQuestion qs) {
 	switch(qs.typ) {
 		case string(): return "document.getElementById(\'<qs.id.name>\').value = <expr2js(qs.expr)>;";
 		case integer(): return "document.getElementById(\'<qs.id.name>\').value = <expr2js(qs.expr)>;";
-		case boolean(): return "document.getElementById(\'<qs.id.name>\').checked = String(<expr2js(qs.expr)>) == \'true\';";
+		case boolean(): return "document.getElementById(\'<qs.id.name>\').checked = getBool(<expr2js(qs.expr)>);";
 	}
 	return "";
 }
 
 str expr2js(AExpr e) {
   	switch (e) {
-	    case ref(id(str x)): return "(document.getElementById(\'<x>\').checked ? true : document.getElementById(\'<x>\').value)";
+	    case ref(id(str x)): return "getBoolOrVal(\'<x>\')";
 	    case strConst(str s): return "<s>";
 	    case intConst(int n): return "<n>";
 	    case boolConst(bool b): return "<b>";    
@@ -144,21 +149,22 @@ str questionhide2js(AQuestion qs) {
 	
 	countJs += 1;
 	switch(qs) {
-		case ifblock(AExpr condition, list[AQuestion] questions): return "if(String(<expr2js(condition)>) == \'true\') {
+		case ifblock(AExpr condition, list[AQuestion] questions): return "if(getBool(<expr2js(condition)>)) {
 		'		document.getElementById(\"If-Field-<toString(countJs)>\").style =\"visibility: show;display: inline;\"
 		'	} else {
 		'		document.getElementById(\"If-Field-<toString(countJs)>\").style =\"visibility: hidden;display: none;\"
 		'	}
-		" + hide2js(questions);
+		'" + hide2js(questions);
 		
-		case ifelseblock(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec): return "if(String(<expr2js(condition)>) == \'true\') {
-		'		document.getElementById(\"If-Field-<toString(countJs)>\").style =\"visibility: show;display: inline;\"
-		'		document.getElementById(\"Else-Field-<toString(countJs)>\").style =\"visibility: hidden;display: none;\"
-		'	} else {
-		'		document.getElementById(\"Else-Field-<toString(countJs)>\").style =\"visibility: show;display: inline;\"
-		'		document.getElementById(\"If-Field-<toString(countJs)>\").style =\"visibility: hidden;display: none;\"
-		'	}
-		" + hide2js(questions) + hide2js(questionsSec);
+		case ifelseblock(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec): return "if(getBool(<expr2js(condition)>)) {
+		'	document.getElementById(\"If-Field-<toString(countJs)>\").style =\"visibility: show;display: inline;\"
+		'	document.getElementById(\"Else-Field-<toString(countJs)>\").style =\"visibility: hidden;display: none;\"
+		'} else {
+		'	document.getElementById(\"Else-Field-<toString(countJs)>\").style =\"visibility: show;display: inline;\"
+		'	document.getElementById(\"If-Field-<toString(countJs)>\").style =\"visibility: hidden;display: none;\"
+		'}
+		'
+		'" + hide2js(questions) + hide2js(questionsSec);
 	}
 	return "";
 }
