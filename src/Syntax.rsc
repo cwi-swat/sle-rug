@@ -3,9 +3,6 @@ module Syntax
 extend lang::std::Layout;
 extend lang::std::Id;
 
-/*
- * Concrete syntax of QL
- */
 
 start syntax Form 
   = @Foldable "form" Id "{" Question* "}"; 
@@ -60,6 +57,3 @@ lexical Int = [\-]?[1-9][0-9]*
 
 lexical Bool = "true"
 	| "false";
-
-
-

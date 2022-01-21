@@ -3,39 +3,14 @@ module Transform
 import Syntax;
 import Resolve;
 import AST;
-import IO;
 import ParseTree;
 
-/* 
- * Transforming QL forms
- */
- 
- 
-/* Normalization:
- *  wrt to the semantics of QL the following
- *     q0: "" int; 
- *     if (a) { 
- *        if (b) { 
- *          q1: "" int; 
- *        } 
- *        q2: "" int; 
- *      }
- *
- *  is equivalent to
- *     if (true) q0: "" int;
- *     if (true && a && b) q1: "" int;
- *     if (true && a) q2: "" int;
- *
- * Write a transformation that performs this flattening transformation.
- *
- */
  
 AForm flatten(AForm f) {	
   return  form(f.name, [*flattenQs(q, []) | AQuestion q <- f.questions]);; 
 }
 
 list[AQuestion] flattenQs(AQuestion q, list[AExpr] exprs) {
-	println("ha");
 	switch(q) {
 		case question(str _, AId _, AType _): return [ifblock(combineExpr(exprs), [q])];
 		case computed(str _, AId _, AType _, AExpr _): return [ifblock(combineExpr(exprs), [q])];
@@ -47,7 +22,6 @@ list[AQuestion] flattenQs(AQuestion q, list[AExpr] exprs) {
 }
 
 AExpr combineExpr(list[AExpr] exprs) {
-	println("hi");
 	AExpr res = boolConst(true);
 	for(e <- exprs) {
 		res = and(res, e);
@@ -55,21 +29,14 @@ AExpr combineExpr(list[AExpr] exprs) {
 	return res;
 }
 
-/* Rename refactoring:
- *
- * Write a refactoring transformation that consistently renames all occurrences of the same name.
- * Use the results of name resolution to find the equivalence class of a name.
- *
- */
- 
- start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
+start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
  	
  	set[loc] toRename = {};
  	
  	if(useOrDef in useDef<1>){
  		toRename += useOrDef;
  		toRename += { u | <loc u, useOrDef> <- useDef};
- 	} else if (useOrDef in useDef<1>){
+ 	} else if (useOrDef in useDef<0>){
  		if (<useOrDef, loc d> <- useDef) {
  			toRename += { u | <d, loc u> <- useDef};
  		}
@@ -81,8 +48,4 @@ AExpr combineExpr(list[AExpr] exprs) {
 		case Id x => [Id] newName
 			when x@\loc in toRename
  	} 
- } 
- 
- 
- 
-
+ }
