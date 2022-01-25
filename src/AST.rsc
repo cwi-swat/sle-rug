@@ -7,6 +7,7 @@ data AForm(loc src = |tmp:///|)
 data AQuestion(loc src = |tmp:///|)
   = question(str label, AId id, AType typ)
   | computed(str label, AId id, AType typ, AExpr expr)
+  | block(list[AQuestion] questions)
   | ifblock(AExpr condition, list[AQuestion] questions)
   | ifelseblock(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec)
   ;

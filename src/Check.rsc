@@ -63,9 +63,24 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
     	msgs += { warning("Duplicate label", q.src) };
 	}
 	
+	if(<d, _, name, _> <- tenv && d != loca)  {
+    	msgs += { error("Duplicate name", q.src) };
+	}
+	
 	if(<d, _, name, t> <- tenv && typQ != t)  {
 		msgs += { error("Question with double name, but different type", d) };
-	}		
+	}
+	
+	if (name == "if" || 
+		name == "else" || 
+		name == "true" || 
+		name == "false" ||
+		name == "integer" ||
+		name == "boolean" ||
+		name == "form" ||
+		name == "string") {
+		msgs += { error("Name shadows built in keyword", q.src) };
+	}
 	
 	switch(q) {
 		case computed(_, _, _, AExpr expr):

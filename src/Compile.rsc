@@ -35,6 +35,7 @@ HTML5Node question2html(AQuestion qs) {
 	switch(qs) {
 		case question(str label, AId id, AType typ): return question2form(qs);
 		case computed(str label, AId id, AType typ, AExpr expr): return computed2form(qs);
+		case block(list[AQuestion] questions): return div([question2html(q) | AQuestion q <- questions]);
 	}
 	
 	count +=1;
@@ -80,7 +81,8 @@ str form2js(AForm f) {
   '	<for(/c:computed(str label, AId id, AType typ, AExpr e) := f) {>
   '		<computed2js(c)> <}> 	
   ' 
-  '		<hide2js(f.questions)>	});
+  '		<hide2js(f.questions)>	
+  '	});
   '
   ' 	$form.dispatchEvent(new Event(\'change\'));
   '}";
@@ -132,6 +134,7 @@ str questionhide2js(AQuestion qs) {
 	switch(qs) {
 		case question(str label, AId id, AType typ): return "";
 		case computed(str label, AId id, AType typ, AExpr expr): return "";
+		case block(list[AQuestion] questions): return hide2js(questions);
 	}
 	
 	countJs += 1;

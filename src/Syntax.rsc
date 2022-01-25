@@ -10,6 +10,7 @@ start syntax Form
 syntax Question
   = Str Id ":" Type
   | Str Id ":" Type "=" Expr
+  |Â @Foldable "{" Question* "}"
   | @Foldable left "if" "(" Expr ")" "{" Question* "}"
   | @Foldable left "if" "(" Expr ")" "{" Question* "}" "else" "{" Question* "}"
   ; 
@@ -29,7 +30,7 @@ syntax Expr
   > left (Expr "\<" Expr
   	| Expr "\<=" Expr
   	| Expr "\>" Expr
-  	| Expr "=\>" Expr)
+  	| Expr "\>=" Expr)
   > left (Expr "!=" Expr
   	| Expr "==" Expr)
   > left Expr "&&" Expr
@@ -52,7 +53,7 @@ syntax Type
 lexical Str = [\"] ![\"]* [\"];
 
 lexical Int = [\-]?[1-9][0-9]*
-  | [0]
+  | [0]
   ;
 
 lexical Bool = "true"
