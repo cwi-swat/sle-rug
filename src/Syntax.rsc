@@ -10,7 +10,7 @@ start syntax Form
 syntax Question
   = Str Id ":" Type
   | Str Id ":" Type "=" Expr
-  |Â @Foldable "{" Question* "}"
+  | @Foldable "{" Question* "}"
   | @Foldable left "if" "(" Expr ")" "{" Question* "}"
   | @Foldable left "if" "(" Expr ")" "{" Question* "}" "else" "{" Question* "}"
   ; 
@@ -18,7 +18,7 @@ syntax Question
 
 syntax Expr 
   = Id \ Reserved
-  | left Str \ Reserved
+  | left Str
   | left Int
   | left Bool
   | bracket "(" Expr ")"
@@ -42,6 +42,10 @@ keyword Reserved
 	| "false"
 	| "if"
 	| "else"
+	| "string"
+	| "integer"
+	| "boolean"
+	| "form"
 	;
   
 syntax Type

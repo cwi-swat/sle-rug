@@ -2,7 +2,6 @@ module Compile
 
 import AST;
 import Resolve;
-import IO;
 import lang::html5::DOM;
 import util::Math;
 
@@ -35,7 +34,7 @@ HTML5Node question2html(AQuestion qs) {
 	switch(qs) {
 		case question(str label, AId id, AType typ): return question2form(qs);
 		case computed(str label, AId id, AType typ, AExpr expr): return computed2form(qs);
-		case block(list[AQuestion] questions): return div([question2html(q) | AQuestion q <- questions]);
+		case block(list[AQuestion] questions): return fieldset([question2html(q) | AQuestion q <- questions]);
 	}
 	
 	count +=1;

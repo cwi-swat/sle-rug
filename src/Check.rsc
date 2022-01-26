@@ -12,7 +12,7 @@ data Type
   | tunknown()
   ;
 
-alias TEnv = rel[loc def, str name, str label, Type \type];
+alias TEnv = rel[loc def, str label, str name, Type \type];
 
 TEnv collect(AForm f) {
 	TEnv tenv =  {};
@@ -71,9 +71,9 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 		msgs += { error("Question with double name, but different type", d) };
 	}
 	
-	if (name == "if" ||Â 
-		name == "else" ||Â 
-		name == "true" ||Â 
+	if (name == "if" || 
+		name == "else" || 
+		name == "true" || 
 		name == "false" ||
 		name == "integer" ||
 		name == "boolean" ||

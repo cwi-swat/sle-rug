@@ -14,6 +14,7 @@ list[AQuestion] flattenQs(AQuestion q, list[AExpr] exprs) {
 	switch(q) {
 		case question(str _, AId _, AType _): return [ifblock(combineExpr(exprs), [q])];
 		case computed(str _, AId _, AType _, AExpr _): return [ifblock(combineExpr(exprs), [q])];
+		case block(list[AQuestion] questions): return [block([*flattenQs(q, exprs) | AQuestion q <- questions])];
 		case ifblock(AExpr condition, list[AQuestion] questions): return [*flattenQs(q, exprs + [condition]) | AQuestion q <- questions];
 		case ifelseblock(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec): return [*flattenQs(q, exprs + [condition]) | AQuestion q <- questions] 
 			+ [*flattenQs(q, exprs + [not(condition)]) | AQuestion q <- questionsSec];

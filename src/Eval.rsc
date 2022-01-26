@@ -47,6 +47,7 @@ VEnv evalOnce(AForm f, Input inp, VEnv venv) {
 		switch(q) {
 			case question(_,_,_): venv = eval(q, inp, venv);
 			case computed(_,AId id,_,AExpr expr): venv[id.name] = eval(expr, venv);
+			case block(list[AQuestion] questions): venv = evalOnce(form("", questions), inp, venv);
 			case ifblock(AExpr condition, list[AQuestion] questions): eval(condition, venv).b ? venv = 
 					evalOnce(form("", questions), inp, venv);
 			case ifelseblock(AExpr condition, list[AQuestion] questions, list[AQuestion] questionsSec): venv = eval(condition, venv).b ? 

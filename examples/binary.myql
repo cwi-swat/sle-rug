@@ -10,16 +10,18 @@ form binary {
           "The answer is" answer_1_2: integer = (1)
         }
         else { 
-          "The answer is" answer_2_3: integer = (2)
+          {
+          	"The answer is" answer_2_3: integer = (2)
+          }
         }
       }
       else { 
         "Is the number between 3 and 4" x_3_4: boolean
         if (x_3_4) { 
-          "The answer is" answer_4_4: integer = (3)
+          "The answer is" answerer: boolean
         }
-        else { 
-          "The answer is" answer_4_5: integer = (4)
+        else {
+          "The answer is" answer_3_4: integer = (4)
         }
       }
     }
