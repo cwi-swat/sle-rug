@@ -1,50 +1,70 @@
 module IDE
 
+import util::LanguageServer;
+import util::Reflective;
+
+import IO;
+
 import Syntax;
 import AST;
 import CST2AST;
 import Resolve;
 import Check;
 import Compile;
-
-import util::IDE;
 import Message;
 import ParseTree;
 
+set[LanguageService] myLanguageContributor() = {
+    parser(Tree (str input, loc src) {
+        return parse(#start[Form], input, src);
+    }),
+    lenses(myLenses),
+    executor(myCommands),
+    summarizer(mySummarizer
+        , providesDocumentation = true
+        , providesDefinitions = true
+        , providesReferences = false
+        , providesImplementations = false)
+};
 
-private str MyQL ="MyQL";
+str type2str(tint()) = "integer";
+str type2str(tbool()) = "boolean";
+str type2str(tstr()) = "string";
+str type2str(tunknown()) = "unknown";
 
-anno rel[loc, loc] Tree@hyperlinks;
+Summary mySummarizer(loc origin, start[Form] input) {
+  AForm ast = cst2ast(input);
+  RefGraph g = resolve(ast);
+  TEnv tenv = collect(ast);
+  set[Message] msgs = check(ast, tenv, g.useDef);
+
+  rel[loc, Message] msgMap = {< m.at, m> | Message m <- msgs };
+  
+  rel[loc, str] docs = { <u, "Type: <type2str(t)>"> | <loc u, loc d> <- g.useDef, <d, _, _, Type t> <- tenv };
+  return summary(origin, messages = msgMap, definitions = g.useDef, documentation = docs);
+}
+
+data Command
+  = compileQL(start[Form] form);
+
+rel[loc,Command] myLenses(start[Form] input) 
+  = {<input@\loc, compileQL(input, title="Compile")>};
+
+
+void myCommands(compileQL(start[Form] ql)) {
+    compile(cst2ast(ql));
+}
 
 void main() {
-  registerLanguage(MyQL, "myql", Tree(str src, loc l) {
-    return parse(#start[Form], src, l);
-  });
-  
-  contribs = {
-    annotator(Tree(Tree t) {
-      if (start[Form] pt := t) {
-        AForm ast = cst2ast(pt);
-        UseDef useDef = resolve(ast).useDef;
-        set[Message] msgs = check(ast, collect(ast), useDef);
-        return t[@messages=msgs][@hyperlinks=useDef];
-      }
-      return t[@messages={error("Not a form", t@\loc)}];
-    }),
-    
-    builder(set[Message] (Tree t) {
-      if (start[Form] pt := t) {
-        AForm ast = cst2ast(pt);
-        UseDef useDef = resolve(ast).useDef;
-        set[Message] msgs = check(ast, collect(ast), useDef);
-        if (msgs == {}) {
-          compile(ast);
-        }
-        return msgs;
-      }
-      return {error("Not a form", t@\loc)};
-    })
-  };
-  
-  registerContributions(MyQL, contribs);
+    registerLanguage(
+        language(
+            pathConfig(srcs = [|std:///|, |project://sle-rug/src|]),
+            "QL",
+            "myql",
+            "IDE",
+            "myLanguageContributor"
+        )
+    );
 }
+
+

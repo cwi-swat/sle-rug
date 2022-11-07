@@ -8,12 +8,10 @@ extend lang::std::Id;
  */
 
 start syntax Form 
-  = "form" Id "{" Question* "}"; 
+  = "form" Id name "{" Question* questions "}"; 
 
 // TODO: question, computed question, block, if-then-else, if-then
-syntax Question
-  = 
-  ; 
+syntax Question = ;
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
@@ -22,9 +20,8 @@ syntax Expr
   = Id \ "true" \ "false" // true/false are reserved keywords.
   ;
   
-syntax Type
-  = ;  
-  
+syntax Type = ;
+
 lexical Str = ;
 
 lexical Int 

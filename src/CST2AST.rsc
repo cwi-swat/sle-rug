@@ -4,7 +4,6 @@ import Syntax;
 import AST;
 
 import ParseTree;
-import String;
 
 /*
  * Implement a mapping from concrete syntax trees (CSTs) to abstract syntax trees (ASTs)
@@ -18,23 +17,22 @@ import String;
 
 AForm cst2ast(start[Form] sf) {
   Form f = sf.top; // remove layout before and after form
-  return form("", [], src=f@\loc); 
+  return form("", [ ], src=f.src); 
 }
 
-AQuestion cst2ast(Question q) {
-  throw "Not yet implemented";
+default AQuestion cst2ast(Question q) {
+  throw "Not yet implemented <q>";
 }
 
 AExpr cst2ast(Expr e) {
   switch (e) {
-    case (Expr)`<Id x>`: return ref(id("<x>", src=x@\loc), src=x@\loc);
-    
+    case (Expr)`<Id x>`: return ref(id("<x>", src=x.src), src=x.src);
     // etc.
     
     default: throw "Unhandled expression: <e>";
   }
 }
 
-AType cst2ast(Type t) {
-  throw "Not yet implemented";
+default AType cst2ast(Type t) {
+  throw "Not yet implemented <t>";
 }

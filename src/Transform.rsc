@@ -39,9 +39,9 @@ AForm flatten(AForm f) {
  *
  */
  
- start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
+start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
    return f; 
- } 
+} 
  
  
  
