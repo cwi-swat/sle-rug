@@ -13,7 +13,7 @@ This page: [https://cwi-swat.github.io/sle-rug/](https://cwi-swat.github.io/sle-
 
 Book: *Software Languages: Syntax, Semantics, and Metaprogramming*, by Ralf L&auml;mmel. The book is for sale here: [Springer](https://www.springer.com/gp/book/9783319907987), [Amazon](https://www.amazon.de/Software-Languages-Syntax-Semantics-Metaprogramming/dp/3319907980) *FREE E-book*: [https://rug.on.worldcat.org/oclc/1036771828](https://rug.on.worldcat.org/oclc/1036771828).
 
-Detailed schedule: [rooster.rug.nl](https://rooster.rug.nl/#/nl/2021-2022/schedule/course-WBCS016-05/timeRange=all)
+Detailed schedule: [rooster.rug.nl](https://rooster.rug.nl/#/en/current/schedule/course-WBCS016-05)
 
 - Week 1: Introduction (Chapters 1 & 2)
 - Week 2: Concrete syntax (Chapters 6 & 7)
@@ -26,9 +26,10 @@ Detailed schedule: [rooster.rug.nl](https://rooster.rug.nl/#/nl/2021-2022/schedu
 
 ### Lab
 
-Fork the [sle-rug](https://github.com/cwi-swat/sle-rug) repository, import the Eclipse project in the root directory, and see the provided modules in `src` for detailed instructions for the exercises from week 2 on. 
+If you haven't done so, install [VS Code](https://code.visualstudio.com/), and install the Rascal VS Code plugin from the extension pane. Documentation is here: [Rascal Docs](https://www.rascal-mpl.org/docs/GettingStarted/).
+Fork the [sle-rug](https://github.com/cwi-swat/sle-rug) repository, add the folder to your VS Code workspace, and check out the provided modules in `src` for detailed instructions for the exercises from week 2 on. 
 
-- Week 1: Install the *stable* [Rascal Eclipse Plugin](https://www.rascal-mpl.org/start/); using the following Eclipse update URL [https://update.rascal-mpl.org/stable/](https://update.rascal-mpl.org/stable/). Do the [Rascal Introduction Tutorial](https://github.com/cwi-swat/rascal-wax-on-wax-off).
+- Week 1: Do the [Rascal Introduction Tutorial](https://github.com/cwi-swat/rascal-wax-on-wax-off).
 - Week 2: Concrete syntax of QL using Rascal's grammar formalism (module `Syntax`)
 - Week 3: Abstract syntax and name analysis of QL (modules `AST`, `CST2AST` and `Resolve`)
 - Week 4: Type checker for QL (module `Check`)
@@ -36,11 +37,6 @@ Fork the [sle-rug](https://github.com/cwi-swat/sle-rug) repository, import the E
 - Week 6: Code generator compiling QL to executable HTML and Javascript (module `Compile`)
 - Week 7: Normalization of QL and rename refactoring (module `Transform`)
 - Week 8: Grading of lab starts
-
-*IMPORTANT NOTES ON USING RASCAL* 
-- Do not use an Eclipse version newer than 2020-06!
-- Install JDK8 (_not_ just JRE, _not_ a newer version of Java)
-- Online documentation: [http://docs.rascal-mpl.org/](http://docs.rascal-mpl.org/)
 
 ## QL
 
