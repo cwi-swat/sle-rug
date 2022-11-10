@@ -1,7 +1,3 @@
-Manifest-Version: 0.0.1
-Main-Function: main
-Courses: courses
 Project-Name: sle-rug
-Main-Module: IDE
 Source: src
-Require-Libraries: 
+Require-Libraries: |lib://rascal-lsp|
