@@ -14,6 +14,7 @@ import Compile;
 import Message;
 import ParseTree;
 
+
 set[LanguageService] myLanguageContributor() = {
     parser(Tree (str input, loc src) {
         return parse(#start[Form], input, src);
