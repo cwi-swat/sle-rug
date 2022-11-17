@@ -1,5 +1,10 @@
 module IDE
 
+/*
+ * Import this module in a Rascal terminal and execute `main()`
+ * to enable language services in the IDE.
+ */
+
 import util::LanguageServer;
 import util::Reflective;
 
