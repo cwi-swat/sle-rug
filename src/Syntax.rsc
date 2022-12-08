@@ -25,20 +25,21 @@ syntax Statement = Id ":" Type ("=" Expr)?;
 // and use C/Java style precedence rules (look it up on the internet)
 syntax Expr 
   = Term
-  | "(" Expr ")" Expr?
-  | Expr "!" Expr
-  > Expr "*" Expr
-  | Expr "/" Expr
-  > Expr "+" Expr
-  | Expr "-" Expr
-  > Expr "\>" Expr
-  | Expr "\<" Expr
-  | Expr "\<=" Expr
-  | Expr "\>=" Expr
-  > Expr "==" Expr
-  | Expr "!=" Expr
-  > Expr "&&" Expr
-  > Expr "||" Expr
+  | "(" Expr ")" Expr
+  > right ( neg: "!" Expr e
+          | umin: "-" Expr e )
+  > left  ( mul: Expr l "*" Expr r
+          | div: Expr l "/" Expr r )
+  > left  ( Expr l "+" Expr r
+          | Expr l "-" Expr r )
+  > left  ( greth: Expr l "\>" Expr r
+          | leth:  Expr l "\<" Expr r
+          | leq: Expr l "\<=" Expr r
+          | geq: Expr l "\>=" Expr r)
+  > left  ( eq:  Expr l "==" Expr r
+          | neq: Expr l "!=" Expr r )
+  > left    and: Expr l "&&" Expr r
+  > left    or:  Expr l "||" Expr r
   ;
 
 syntax Type
@@ -50,7 +51,7 @@ syntax Type
 syntax Term
   = Id \ "true" \ "false"
   | StrLiteral
-  | "-"* IntLiteral
+  | IntLiteral
   | BoolLiteral
   ;
 
