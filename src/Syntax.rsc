@@ -11,14 +11,14 @@ start syntax Form
   = "form" Id name "{" Question* questions "}"; 
 
 // TODO: question, computed question, block, if-then-else, if-then
-syntax Question = StrLiteral Statement
+syntax Question = StrLiteral Prompt
                 | "if" "(" Expr ")" "{" Question* "}" ElseStatement?
                 ;
 
 syntax ElseStatement  = "else" "{" Question* "}"
                   ;
 
-syntax Statement = Id ":" Type ("=" Expr)?;
+syntax Prompt = Id ":" Type ("=" Expr)?;
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
@@ -30,8 +30,8 @@ syntax Expr
           | umin: "-" Expr e )
   > left  ( mul: Expr l "*" Expr r
           | div: Expr l "/" Expr r )
-  > left  ( Expr l "+" Expr r
-          | Expr l "-" Expr r )
+  > left  ( add: Expr l "+" Expr r
+          | min: Expr l "-" Expr r )
   > left  ( greth: Expr l "\>" Expr r
           | leth:  Expr l "\<" Expr r
           | leq: Expr l "\<=" Expr r
