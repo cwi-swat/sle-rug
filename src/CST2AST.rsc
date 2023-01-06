@@ -15,44 +15,31 @@ import ParseTree;
  * - See the ref example on how to obtain and propagate source locations.
  */
 
-/*AForm cst2ast(start[Form] sf) {
-  Form f = sf.top; // remove layout before and after form
-  return form("", [ ], src=f.src); 
-}
-
-/*default AQuestion cst2ast(Question q) {
-  throw "Not yet implemented <q>";
-}
-
-AExpr cst2ast(Expr e) {
-  switch (e) {
-    case (Expr)`<Id x>`: return ref(id("<x>", src=x.src), src=x.src);
-    // etc.
-    
-    default: throw "Unhandled expression: <e>";
+AForm cst2ast(start[Form] sf) {
+  Form f = sf.top; // remove layout before and after form 
+  switch (f) {
+    case (Form)`form <Id name> { <Question* questions> }`: return form("<name>", [cst2ast(q) | Question q <- questions], src=f.src);
+  
+    default: throw "Unhandled form: <sf>";
   }
 }
-
-default AType cst2ast(Type t) {
-  throw "Not yet implemented <t>";
-}*/
 
 
 AQuestion cst2ast(Question q) {
   switch (q){
     case (Question)`<StrLiteral nameQ><Prompt promptQ>`: return question("<nameQ>", cst2ast(promptQ),src=q.src);
+    case (Question)`if ( <Expr guard> ) { <Question* questions> } <ElseStatement? elseStat>`: return question(cst2ast(guard), [cst2ast(q) | Question q <- questions], [cst2ast(els) | ElseStatement els <- elseStat], src=q.src);
   
 
-    default: throw "Unhandeled question: <q>";
+    default: throw "Unhandled question: <q>";
   }
 }
 
-AExpr cst2ast(Expr e) {
-  switch (e) {
-    case (Expr)`<Id x>`: return ref(id("<x>", src=x.src), src=x.src);
-    // etc.
-    
-    default: throw "Unhandled expression: <e>";
+AElseStatement cst2ast(ElseStatement e){
+  switch(e){
+    case(ElseStatement)`else { <Question* qs> }` : return elseStat([cst2ast(q) | Question q <- qs], src = e.src);
+
+    default: throw "Unhandled else statement: <e>";
   }
 }
 
@@ -64,6 +51,30 @@ APrompt cst2ast(Prompt p){
     default: throw "Unhandled prompt: <p>";  
   }
 }
+
+AExpr cst2ast(Expr e) {
+  switch (e) {
+    case (Expr)`<Term x>`: return expr(cst2ast(x), src=e.src);
+    case (Expr)`( <Expr left> ) <Expr right>`: return expr(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`!<Expr right>`: return not(cst2ast(right), src=e.src);
+    case (Expr)`-<Expr right>`: return umin(cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> * <Expr right>`: return mul(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> / <Expr right>`: return div(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> + <Expr right>`: return add(cst2ast(left), cst2ast(right), src=e.src); 
+    case (Expr)`<Expr left> - <Expr right>`: return sub(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> \> <Expr right>`: return greth(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> \< <Expr right>`: return leth(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> =\> <Expr right>`: return geq(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> =\< <Expr right>`: return leq(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> == <Expr right>`: return eq(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> != <Expr right>`: return neq(cst2ast(left), cst2ast(right), src=e.src); 
+    case (Expr)`<Expr left> && <Expr right>`: return and(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`<Expr left> || <Expr right>`: return or(cst2ast(left), cst2ast(right), src=e.src);
+    
+    default: throw "Unhandled expression: <e>";
+  }
+}
+
 
 AType cst2ast(Type t) {
   switch(t){
@@ -78,14 +89,22 @@ AType cst2ast(Type t) {
 
 ATerm cst2ast(Term t){
   switch(t){
-    case(Term)`<Id x>`: return term(id("<x>", src=x.src));
-    case(Term)`<StrLiteral s>`: return term("<s>", src=t.src);    //string
+    case(Term)`<Id x>`: return term(id("<x>", src=x.src), src = t.src);
     case(Term)`<IntLiteral i>`: return term("<i>", src=t.src);    //integer
+    case(Term)`<StrLiteral s>`: return term("<s>", src=t.src);    //string
     case(Term)`<BoolLiteral b>`: return term("<b>", src=t.src);   //bool
 
     default: throw "Unhandled type: <t>";
   }
 
+}
+
+AElseStatement cst2ast(ElseStatement e) {
+  switch(e) {
+    case(ElseStatement)`else { <Question* questions> }`: return elseStat([cst2ast(q) | Question q <- questions], src=e.src);
+
+    default: throw "Unhandled else statement: <e>";
+  }
 }
 
 
