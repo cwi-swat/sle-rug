@@ -11,13 +11,23 @@ data Type
   | tunknown()
   ;
 
+Type Atype2Type(AType aType) {
+  switch(aType.typeName) {
+    case "integer": return tint();
+    case "boolean": return tbool();
+    case "str":     return tstr();
+
+    default: return tunknown();
+  }
+}
+
 // the type environment consisting of defined questions in the form 
 alias TEnv = rel[loc def, str name, str label, Type \type];
 
 // To avoid recursively traversing the form, use the `visit` construct
 // or deep match (e.g., `for (/question(...) := f) {...}` ) 
 TEnv collect(AForm f) {
-  return {}; 
+  return{< prompt.id.src, prompt.id.name, name, Atype2Type(prompt.aType) > | /question(str name, APrompt prompt) := f};
 }
 
 set[Message] check(AForm f, TEnv tenv, UseDef useDef) {

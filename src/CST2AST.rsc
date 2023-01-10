@@ -45,8 +45,10 @@ AElseStatement cst2ast(ElseStatement e){
 
 APrompt cst2ast(Prompt p){
   switch(p){
-    case (Prompt)`<Id x> : <Type t> = <Expr es>`: 
-      return prompt(id("<x>", src=x.src), cst2ast(t) ,[cst2ast(e)| Expr e <- es], src=p.src);
+    case (Prompt)`<Id x> : <Type t>`: 
+      return prompt(id("<x>", src=x.src), cst2ast(t) ,[], src=p.src);
+    case (Prompt)`<Id x> : <Type t> = <Expr es>`:
+      return prompt(id("<x>", src=x.src), cst2ast(t) ,[cst2ast(es)], src=p.src);
 
     default: throw "Unhandled prompt: <p>";  
   }

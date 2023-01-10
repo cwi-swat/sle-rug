@@ -44,7 +44,7 @@ data AExpr(loc src = |tmp:///|)
   ;
 
 data AType(loc src = |tmp:///|)
-  = atype(str atype)
+  = atype(str typeName)
   ;
 
 data ATerm(loc src = |tmp:///|)
