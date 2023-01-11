@@ -1,0 +1,79 @@
+/*
+
+    - when an event happens .... 
+    - lift to sequence events
+
+
+*/
+
+alias Running = str(str);
+//mathemitical target type
+
+
+Running deno(AMachine m){
+    //declare local variable which denotaes current state
+    str current = m.states[0].name.name;
+
+   //updates (closure cpasuring) the current capture state
+    return str(str event){
+        current = step(event, current, m);
+        return current;
+    }
+}
+
+/*running = deno(ast);
+running("open");
+> opened
+running("close");
+>closed
+*/
+
+
+//^
+//List of events: you dont get the list all at ones, infinte stream of machine, not accuretly modelled here
+str steps(list[str] events, str current, AMchine m)
+ =( current | step(event, it, m) | str event <- events);
+
+
+str steps(list[str] events, str current, AMachine m){
+    for(str event <- events){
+        current = step(event, current, m);
+    }
+    return current
+}
+
+// ^ in terminal events = [öpeen", "close", "lock", "unlock"];
+// steps(events, "closed",ast)
+
+
+//current is a side effect
+str step(str event, str current, AMachine m){
+    
+    if(/s:state(id(current), list[Atrans ts]) <- m.states){
+        if(trans(is(event), id( str target))<- ts){
+            return target;
+        }
+        /* expection, reset to intial state, exit etc > deisgn choices */
+        return current;
+    }
+
+    assert false: "cannot happen"; /* document assupmtion
+    return "";
+}
+
+/* ^in terminal step("opensdsdsd", "closed", ast)
+
+
+test bool loopTransistionNoChange() =  step("e", "x ", m) == "x"
+        when AMachine. := cst2ast((Machine)'machine x state x e =\> x end');
+
+//in terminal :test
+
+
+
+
+
+// for the opdracht default
+// string become empty, bool false and int 0
+
+//side click

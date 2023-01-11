@@ -8,7 +8,7 @@ module AST
  */
 
 data AForm(loc src = |tmp:///|)
-  = form(str name, list[AQuestion] questions)
+  = form(AId name, list[AQuestion] questions)
   ; 
 
 data AQuestion(loc src = |tmp:///|)
@@ -28,7 +28,7 @@ data AExpr(loc src = |tmp:///|)
   = expr(ATerm aterm)
   | expr(AExpr expr1, AExpr expr2)
   | not(AExpr rhs)
-  | umin(AExpr rhs)
+  //| umin(AExpr rhs)
   | mul(AExpr lhs, AExpr rhs)
   | div(AExpr lhs, AExpr rhs)
   | add(AExpr lhs, AExpr rhs)

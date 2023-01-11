@@ -1,0 +1,37 @@
+Hi,
+
+We have some trouble understanding the code aswell as testing the code. 
+Eventhough we wrote down the live coding we still can not figure it out with the project code.
+
+So we have a couple of questions: 
+
+1.	Testing the AST and CST2AST class
+We think we have made a good AST and CST2AST class, but we do not know if there is a proper commmand line to test these classes in the Rascal terminal and show as maybe information.
+
+
+2. The Resolve class
+2.1 We are a bit confused about the Resolve class. In the CST2AST class for AForm we return the source of f, this is location where it is declared (right?), but is it also the location where it is used? Because in the uses and def function in 
+the Resolve class you want the declare and occurence location of AForm f.
+
+2.2 Also we do not know if the given functions are the only functions we should use or that we should add more to the class (so use and def for AQuestion and all the other data's).
+Because in the check class you check for AQuestion, AExpr etc. and do you want the uses and defs function for them aswell or are uses and defs for AForm enough because question and experssion are linked to that form?
+
+2.3 Lastly, how can we test the Resolve class?
+
+
+3. The Checking class (working and testing)
+For this we have the same problem as for the AST and CST2AST classes. We would like to know how we can test the Check class?
+Should we use the mySummarizer in the main() of IDE or are there command lines?
+
+
+4. Constructors
+We have doubts about the constructors that we use in for example the AST (So stuff like question(str name, APrompt prompt)). Where should these be defined if we define them?
+
+
+Hopefully the questions are clear enough so that you're able to answer them. If not, let us know.
+
+Thanks in advance and kind regards,
+Tomas and Joy
+
+
+

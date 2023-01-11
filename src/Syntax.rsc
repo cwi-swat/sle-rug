@@ -8,7 +8,7 @@ extend lang::std::Id;
  */
 
 start syntax Form 
-  = "form" Id name "{" Question* questions "}"; 
+  = "form" Id "{" Question* "}"; 
 
 // TODO: question, computed question, block, if-then-else, if-then
 syntax Question = StrLiteral Prompt
@@ -27,7 +27,7 @@ syntax Expr
   = Term
   | "(" Expr ")" Expr
   > right ( neg: "!" Expr e
-          | umin: "-" Expr e )
+          /*| umin: "-" Expr e */ )
   > left  ( mul: Expr l "*" Expr r
           | div: Expr l "/" Expr r )
   > left  ( add: Expr l "+" Expr r

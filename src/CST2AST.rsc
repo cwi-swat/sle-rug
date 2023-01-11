@@ -18,7 +18,7 @@ import ParseTree;
 AForm cst2ast(start[Form] sf) {
   Form f = sf.top; // remove layout before and after form 
   switch (f) {
-    case (Form)`form <Id name> { <Question* questions> }`: return form("<name>", [cst2ast(q) | Question q <- questions], src=f.src);
+    case (Form)`form <Id name> { <Question* questions> }`: return form(id("<name>", src = name.src), [cst2ast(q) | Question q <- questions], src=f.src);
   
     default: throw "Unhandled form: <sf>";
   }
@@ -59,7 +59,7 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Term x>`: return expr(cst2ast(x), src=e.src);
     case (Expr)`( <Expr left> ) <Expr right>`: return expr(cst2ast(left), cst2ast(right), src=e.src);
     case (Expr)`!<Expr right>`: return not(cst2ast(right), src=e.src);
-    case (Expr)`-<Expr right>`: return umin(cst2ast(right), src=e.src);
+    //case (Expr)`-<Expr right>`: return umin(cst2ast(right), src=e.src); TODO: This gives an error
     case (Expr)`<Expr left> * <Expr right>`: return mul(cst2ast(left), cst2ast(right), src=e.src);
     case (Expr)`<Expr left> / <Expr right>`: return div(cst2ast(left), cst2ast(right), src=e.src);
     case (Expr)`<Expr left> + <Expr right>`: return add(cst2ast(left), cst2ast(right), src=e.src); 

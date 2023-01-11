@@ -1,0 +1,47 @@
+/* import vis::Text (You need to update it)
+ * pretty -> prettyTree, prettyNode
+ *
+ * Errors:
+ * - Tranitions to undefined state
+ * - Duplicate definition of state
+ * - Unreachable State
+ *
+ * Warning:
+ * - Non-determintion
+ * - Self transition
+*/
+
+    set(Message) msgs = {}
+
+    for(<loc u, _> <- g.uses)
+        if(! (<u, _> <- g.useDef))
+            msgs += error("Transisition to undefined state", u )
+
+    //or
+
+    msgs += {error("Transisiton to undefined state", u)
+        	| <loc u, _> <- g.defs, !(d <- g.useDef)} 
+
+
+
+    msgs += {warning("Unused state", d) 
+            | <loc d > <-g.defs, !(d<- g.useDef)}
+
+    msgs += {error("Duplicate state", d)
+            | <str x, loc d> <- g.defs, <x, loc d2><- g.defs, d2!=d}
+
+    msgs += {warning("Transisiton to self", u)
+            | /state(AId x, list[Transisition] ts)<-m.status,
+                Trans t <-ts, loc u := t.target.src,
+                loc d := x.src, <u,d><-g.useDef};
+
+    // Use tree structure
+    // Loop over transistions in state itself
+
+    rel(loc,loc) reach = {<d1,d2>| <loc u, locd><-g.useDef, state(AId x, list[ATrans] ts)<- m.states, 
+                            ATrans t <- ts, t.target.src == u}   
+    //Tuple of two locations
+
+    msgs += {error("Unreachable state", d)
+            | <_, loc d><-g.defs, d not in (reach+) [m.states[0].name.src]}
+    // Not unused but unreachable        
