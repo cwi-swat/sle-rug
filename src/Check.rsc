@@ -148,7 +148,7 @@ set[Message] check(APrompt p, TEnv tenv, UseDef useDef) {
         for(AExpr e <- expressions) {
           //msgs += { error("Expression does not match type", p.src) | AExpr, t != tbool() };
           msgs +=  check(e, tenv, useDef);
-         
+          msgs += { error("Question has another type than the expression", e.src) | Atype2Type(p.aType) != typeOf(e, tenv, useDef) };
         }
 
     }
@@ -218,50 +218,56 @@ Type typeOf(ABinaryOp bOp, TEnv tenv, UseDef useDef) {
       if(typeOf(lhs, tenv, useDef) != tint()) {
         return terror();
       }
-      return typeOf(lhs, tenv, useDef);
-    }
+      return tbool();
+    } 
     case leth(AExpr lhs, _):{
       //Type is of int, otherwise error
       if(typeOf(lhs, tenv, useDef) != tint()) {
         return terror();
       }
-      return typeOf(lhs, tenv, useDef);
+      return tbool();
     }
     case geq(AExpr lhs, _):{
       //Type is of int, otherwise error
       if(typeOf(lhs, tenv, useDef) != tint()) {
         return terror();
       }
-      return typeOf(lhs, tenv, useDef);
+      return tbool();
     }
     case leq(AExpr lhs, _): {
       //Type is of int, otherwise error
       if(typeOf(lhs, tenv, useDef) != tbool()) {
         return terror();
       }
-      return typeOf(lhs, tenv, useDef);  
+      return tbool(); 
     }
-    case eq(AExpr lhs, _):
+    case eq(AExpr lhs, _): {
       //Bool, str and int
-      return typeOf(lhs, tenv, useDef);
-    
-    case neq(AExpr lhs, _):
+      if(typeOf(lhs, tenv, useDef) == terror()) {
+        return terror();
+      }
+      return tbool();
+    }
+    case neq(AExpr lhs, _): {
       //Bool, str and int
-      return typeOf(lhs, tenv, useDef);
-    
+      if(typeOf(lhs, tenv, useDef) == terror()) {
+        return terror();
+      }
+      return tbool();
+    }
     case and(AExpr lhs, _): {
       //Type is of bool, otherwise error
       if(typeOf(lhs, tenv, useDef) != tbool()) {
         return terror();
       }
-      return typeOf(lhs, tenv, useDef);  
+      return tbool();
     }
     case or(AExpr lhs, _): {
       //Type is of bool, otherwise error
       if(typeOf(lhs, tenv, useDef) != tbool()) {
         return terror();
       }
-      return typeOf(lhs, tenv, useDef);  
+      return tbool();
     }
   }
 
