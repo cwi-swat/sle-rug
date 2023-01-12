@@ -53,9 +53,9 @@ data AType(loc src = |tmp:///|)
 
 data ATerm(loc src = |tmp:///|)
   = term(AId x)
-  | term(int integer)
-  | term(str string)
-  | term(bool boolean)
+  | termInt(str integer)
+  | termStr(str string)
+  | termBool(str boolean)
   ;
 
 data AId(loc src = |tmp:///|)

@@ -99,10 +99,10 @@ AType cst2ast(Type t) {
 
 ATerm cst2ast(Term t){
   switch(t){
-    case(Term)`<Id x>`: return term(id("<x>", src=x.src), src = t.src);
-    case(Term)`<IntLiteral i>`: return term("<i>", src=t.src);    //integer
-    case(Term)`<StrLiteral s>`: return term("<s>", src=t.src);    //string
-    case(Term)`<BoolLiteral b>`: return term("<b>", src=t.src);   //bool
+    case(Term)`<Id x>`: return term(id("<x>", src=x.src), src = t.src); 
+    case(Term)`<IntLiteral i>`: return termInt("<i>", src=t.src);    //integer
+    case(Term)`<StrLiteral s>`: return termStr("<s>", src=t.src);    //string
+    case(Term)`<BoolLiteral b>`: return termBool("<b>", src=t.src);   //bool
 
     default: throw "Unhandled type: <t>";
   }

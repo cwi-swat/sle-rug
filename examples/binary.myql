@@ -1,6 +1,5 @@
 form binary {
   "Is the number between 1 and 10" x_1_10: integer
-  "Is the number between 1 and 10" x_1_10: boolean
   if (x_1_10) { 
     "Is the number between 1 and 5" x_1_5: boolean
     if (x_1_5) { 
@@ -46,7 +45,7 @@ form binary {
             "The answer is" answer_8_9: integer = (8)
           }
           else { 
-            "The answer is" answer_9_10: integer = 10 + true
+            "The answer is" answer_9_10: integer = 4 + true
           }
         }
       }
