@@ -25,10 +25,14 @@ syntax Prompt = Id ":" Type ("=" Expr)?;
 // and use C/Java style precedence rules (look it up on the internet)
 syntax Expr 
   = Term
-  | "(" Expr ")" Expr
-  > right ( neg: "!" Expr e
+  | "(" Expr ")"
+  > right ( neg: "!" Expr
           /*| umin: "-" Expr e */ )
-  > left  ( mul: Expr l "*" Expr r
+  > binaryOp: BinaryOp
+  ;
+
+syntax BinaryOp
+  = left  ( mul: Expr l "*" Expr r
           | div: Expr l "/" Expr r )
   > left  ( add: Expr l "+" Expr r
           | min: Expr l "-" Expr r )

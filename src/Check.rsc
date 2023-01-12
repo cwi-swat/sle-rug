@@ -54,33 +54,26 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 
   switch(q) {
     case question(str name, APrompt prompt): {
-      //msgs += { error("Duplicate name with different type", prompt.id.src) | <_, _, name, Type t> <- tenv, t != Atype2Type(prompt.aType) };
-      // println(tenv[_, _, name]);
-      // println({Atype2Type(prompt.aType)});
-
-      loc p = prompt.id.src;
-
-      if(<_, _, name, Type t> <- tenv, <p, _, name, Type t2> <- tenv, t != t2) {
-        println(prompt.aType);
-        println(t);
-        println(Atype2Type(prompt.aType));
-        msgs += { error("Duplicate name with different type", prompt.id.src) };
-      }
-
-      if(<loc d, _, name, _> <- tenv, prompt.id.src != d) {
-        msgs += {warning("Duplicate label", q.src)};
-      }
+      // Warning: duplicate labels
+      msgs += {warning("Duplicate label", q.src) | <loc d, _, name, _> <- tenv, <loc d2, _, name, _> <- tenv, d != d2};
+      // Error: there are declared questions with the same name but different types.
+      msgs += {error("Duplicate label TTTTTT", q.src) | <loc d, _, name, _> <- tenv, <loc d2, _, name, _> <- tenv, d != d2, <_, _, name, Type t> <- tenv, <_, _, name, Type t2> <- tenv, t != t2};
+      
+      //Check prompt
+      msgs += check(prompt, tenv, useDef);
     }
 
 
-    case question(_,  list[AQuestion] questions, list[AElseStatement] elseStat): {
+    case question(AExpr expr,  list[AQuestion] questions, list[AElseStatement] elseStat): {
+      str name = expr.aterm.x.name;
+      msgs += {error("Guard is not a boolean value", q.src) | <_, name, _, Type t> <- tenv, t != tbool() };
+      for(AQuestion q <- questions) {
+        check(q, tenv, useDef);
+      }
       for(AElseStatement els <- elseStat) {
         for(AQuestion q <- els.questions) {
           check(q, tenv, useDef);
         }
-      }
-      for(AQuestion q <- questions) {
-        check(q, tenv, useDef);
       }
     }
   }
@@ -93,6 +86,21 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
   return msgs; 
 }
 
+set[Message] check(APrompt p, TEnv tenv, UseDef useDef) {
+  set[Message] msgs = {};
+
+  switch(p) {
+    case prompt(AId id, AType aType, list[AExpr] expressions): {
+      for(AExpr <- expressions) {
+        //msgs += { error("Expression does not match type", p.src) |  t != tbool() };
+        msgs += {};
+      }
+    }
+  }
+
+  return msgs;
+}
+
 // Check operand compatibility with operators.
 // E.g. for an addition node add(lhs, rhs), 
 //   the requirement is that typeOf(lhs) == typeOf(rhs) == tint()
@@ -100,8 +108,13 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
   
   switch (e) {
-    case ref(AId x):
-      msgs += { error("Undeclared question", x.src) | useDef[x.src] == {} };
+    case binaryOp(ABinaryOp bOp): {
+      if(typeOf(bOp.lhs, tenv, useDef) != typeOf(rhs, tenv, useDef)) {
+        msgs += { error("Types of binary operator are inequal", e.src) };
+      }
+      msgs += check(lhs, tenv, useDef);
+      msgs += check(rhs, tenv, useDef);
+    }
 
     // etc.
   }
@@ -109,13 +122,43 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
   return msgs; 
 }
 
+// 1 +    ((x + y ) * 2) > check z* 2, z =,   ( ( (x + q)) + y ) + w 
+// lhs = 1 , rhs =3
+//typeof(1) > add 
+// typeof(1) == typeof(3)
+//typeof(1 + 3) > add typepof(lhs), 
+
 Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
   switch (e) {
-    case ref(id(_, src = loc u)):  
-      if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
+    case expr(ATerm aterm):  
+      return typeOf(aterm, tenv, useDef);
+    case expr(AExpr expr1, AExpr _):
+      return typeOf(expr1, tenv, useDef);
+    case not(AExpr rhs):
+      return typeOf(rhs, tenv, useDef);
+    case binarOp(AExpr lhs, _):
+      return typeOf(lhs, tenv, useDef);
+    // etc.
+  }
+  return tunknown(); 
+}
+
+Type typeOf(ATerm aterm, TEnv tenv, UseDef useDef) {
+  switch (aterm) {
+    case term(id(str name, src = loc u)): {
+      if (<u, loc d> <- useDef, <d, name, _, Type t> <- tenv) {
         return t;
       }
-    // etc.
+    } 
+    case term(int _): {
+      return tint();
+    }
+    case term(bool _): {
+      return tbool();
+    }
+    case term(str _): {
+      return tstr();
+    }
   }
   return tunknown(); 
 }

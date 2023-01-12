@@ -57,26 +57,34 @@ APrompt cst2ast(Prompt p){
 AExpr cst2ast(Expr e) {
   switch (e) {
     case (Expr)`<Term x>`: return expr(cst2ast(x), src=e.src);
-    case (Expr)`( <Expr left> ) <Expr right>`: return expr(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr)`( <Expr x> )`: return exprPar(cst2ast(x), src=e.src);
     case (Expr)`!<Expr right>`: return not(cst2ast(right), src=e.src);
     //case (Expr)`-<Expr right>`: return umin(cst2ast(right), src=e.src); TODO: This gives an error
-    case (Expr)`<Expr left> * <Expr right>`: return mul(cst2ast(left), cst2ast(right), src=e.src);
-    case (Expr)`<Expr left> / <Expr right>`: return div(cst2ast(left), cst2ast(right), src=e.src);
-    case (Expr)`<Expr left> + <Expr right>`: return add(cst2ast(left), cst2ast(right), src=e.src); 
-    case (Expr)`<Expr left> - <Expr right>`: return sub(cst2ast(left), cst2ast(right), src=e.src);
-    case (Expr)`<Expr left> \> <Expr right>`: return greth(cst2ast(left), cst2ast(right), src=e.src);
-    case (Expr)`<Expr left> \< <Expr right>`: return leth(cst2ast(left), cst2ast(right), src=e.src);
-    case (Expr)`<Expr left> =\> <Expr right>`: return geq(cst2ast(left), cst2ast(right), src=e.src);
-    case (Expr)`<Expr left> =\< <Expr right>`: return leq(cst2ast(left), cst2ast(right), src=e.src);
-    case (Expr)`<Expr left> == <Expr right>`: return eq(cst2ast(left), cst2ast(right), src=e.src);
-    case (Expr)`<Expr left> != <Expr right>`: return neq(cst2ast(left), cst2ast(right), src=e.src); 
-    case (Expr)`<Expr left> && <Expr right>`: return and(cst2ast(left), cst2ast(right), src=e.src);
-    case (Expr)`<Expr left> || <Expr right>`: return or(cst2ast(left), cst2ast(right), src=e.src);
+    case (Expr) `<BinaryOp bOp>`: return binaryOp(cst2ast(bOp), src=e.src);
+    
     
     default: throw "Unhandled expression: <e>";
   }
 }
 
+ABinaryOp cst2ast(BinaryOp b) {
+  switch(b) {
+    case (BinaryOp)`<Expr left> * <Expr right>`: return mul(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> / <Expr right>`: return div(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> + <Expr right>`: return add(cst2ast(left), cst2ast(right), src=b.src); 
+    case (BinaryOp)`<Expr left> - <Expr right>`: return sub(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> \> <Expr right>`: return greth(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> \< <Expr right>`: return leth(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> =\> <Expr right>`: return geq(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> =\< <Expr right>`: return leq(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> == <Expr right>`: return eq(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> != <Expr right>`: return neq(cst2ast(left), cst2ast(right), src=b.src); 
+    case (BinaryOp)`<Expr left> && <Expr right>`: return and(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> || <Expr right>`: return or(cst2ast(left), cst2ast(right), src=b.src);
+
+    default: throw "Unhandled binary operator: <b>";
+  }
+}
 
 AType cst2ast(Type t) {
   switch(t){
