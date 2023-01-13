@@ -52,6 +52,7 @@ Input createInput(str question, Value \value){
 // Because of out-of-order use and declaration of questions
 // we use the solve primitive in Rascal to find the fixpoint of venv.
 VEnv eval(AForm f, Input inp, VEnv venv) {
+  venv[inp.question] = inp.\value;
   return solve (venv) {
     venv = evalOnce(f, inp, venv);
   }
@@ -59,7 +60,6 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
 
 VEnv evalOnce(AForm f, Input inp, VEnv venv) {
   // Eval the questions
-  venv[inp.question] = inp.\value;
   for (AQuestion q <- f.questions ){
     venv = eval( q, inp, venv);
   }
@@ -71,7 +71,7 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
   // evaluate inp and computed questions to return updated VEnv
   switch(q) {
     case question(str name, APrompt prompt): {
-      return eval(prompt, inp, venv);
+      venv = eval(prompt, inp, venv);
     }
     case question(AExpr expr,  list[AQuestion] questions, list[AElseStatement] elseStat): {
       for(AQuestion q <- questions) {
@@ -125,6 +125,7 @@ Value eval(ABinaryOp bOp, VEnv venv){
   
   switch (bOp) {
     case mul(AExpr lhs, AExpr rhs):{
+      //println(vint(eval(lhs, venv).n * eval(rhs, venv).n));
       return vint(eval(lhs, venv).n * eval(rhs, venv).n);
     }
     case div(AExpr lhs,  AExpr rhs):{
@@ -134,21 +135,23 @@ Value eval(ABinaryOp bOp, VEnv venv){
       return vint(eval(lhs, venv).n + eval(rhs, venv).n);
     }
     case sub(AExpr lhs,  AExpr rhs):{
+      // println(venv["sellingPrice"]);
+      //println(vint(eval(lhs, venv).n - eval(rhs, venv).n));
       return vint(eval(lhs, venv).n - eval(rhs, venv).n);
     }
     case greth(AExpr lhs,  AExpr rhs):{
-      return vunknown();
+      return vbool(eval(lhs, venv).n > eval(rhs, venv).n);
     } 
     case leth(AExpr lhs,  AExpr rhs):{
-      return vunknown();
+      return vbool(eval(lhs, venv).n < eval(rhs, venv).n);
     }
     case geq(AExpr lhs,  AExpr rhs):{
-      return vunknown();
+      return vbool(eval(lhs, venv).n >= eval(rhs, venv).n);
     }
     case leq(AExpr lhs,  AExpr rhs): {
-      return vunknown();
+      return vbool(eval(lhs, venv).n <= eval(rhs, venv).n);
     }
-    case eq(AExpr lhs,  AExpr rhs): {
+    case eqls(AExpr lhs,  AExpr rhs): {
       Value lhsVal = eval(lhs, venv);
       Value rhsVal = eval(rhs, venv);
       switch(lhsVal) {

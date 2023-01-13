@@ -241,7 +241,7 @@ Type typeOf(ABinaryOp bOp, TEnv tenv, UseDef useDef) {
       }
       return tbool(); 
     }
-    case eq(AExpr lhs, _): {
+    case eqls(AExpr lhs, _): {
       //Bool, str and int
       if(typeOf(lhs, tenv, useDef) == terror()) {
         return terror();

@@ -1,0 +1,34 @@
+form testExample { 
+    "Did you buy a house in 2010?"
+        booltest: boolean = (1 < 2) && true
+
+    "Did you buy a house in 2011?"
+        inttest: integer = ((((1 + 2) * 3) + 5) - (10 / 2))
+
+    "hello"
+        strtest: str
+    
+    "or"
+        boolor: boolean = (booltest || false)
+
+    "times"
+        inttimes: integer = inttest + 1
+
+    "again"
+        intagain: integer = inttimes * inttest
+
+    "equal"
+        strequal: boolean = strtest == "hello there"
+
+    "noteqaul"
+        strNotequal: boolean = strtest != "hello there"
+
+    "bigger"
+        biggerThan: boolean = 10 > 3
+
+    "changeBool"
+        cBool: boolean 
+
+    "changeBool2"
+        cBool2: boolean = true                           
+}

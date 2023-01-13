@@ -31,6 +31,13 @@ syntax Expr
   > binaryOp: BinaryOp
   ;
 
+
+// 1 + 2 * 3
+// Lhs = ? and rhs ? 
+// *3 > rhs =3 and lhs= 2
+// lhs = 1, rhs = > 2 * 3
+
+
 syntax BinaryOp
   = left  ( mul: Expr l "*" Expr r
           | div: Expr l "/" Expr r )
@@ -40,7 +47,7 @@ syntax BinaryOp
           | leth:  Expr l "\<" Expr r
           | leq: Expr l "\<=" Expr r
           | geq: Expr l "\>=" Expr r)
-  > left  ( eq:  Expr l "==" Expr r
+  > left  ( eqls:  Expr l "==" Expr r
           | neq: Expr l "!=" Expr r )
   > left    and: Expr l "&&" Expr r
   > left    or:  Expr l "||" Expr r

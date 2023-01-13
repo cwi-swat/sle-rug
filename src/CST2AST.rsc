@@ -5,6 +5,8 @@ import AST;
 
 import ParseTree;
 
+import IO;
+
 /*
  * Implement a mapping from concrete syntax trees (CSTs) to abstract syntax trees (ASTs)
  *
@@ -77,7 +79,7 @@ ABinaryOp cst2ast(BinaryOp b) {
     case (BinaryOp)`<Expr left> \< <Expr right>`: return leth(cst2ast(left), cst2ast(right), src=b.src);
     case (BinaryOp)`<Expr left> \>= <Expr right>`: return geq(cst2ast(left), cst2ast(right), src=b.src);
     case (BinaryOp)`<Expr left> \<= <Expr right>`: return leq(cst2ast(left), cst2ast(right), src=b.src);
-    case (BinaryOp)`<Expr left> == <Expr right>`: return eq(cst2ast(left), cst2ast(right), src=b.src);
+    case (BinaryOp)`<Expr left> == <Expr right>`: return eqls(cst2ast(left), cst2ast(right), src=b.src); 
     case (BinaryOp)`<Expr left> != <Expr right>`: return neq(cst2ast(left), cst2ast(right), src=b.src); 
     case (BinaryOp)`<Expr left> && <Expr right>`: return and(cst2ast(left), cst2ast(right), src=b.src);
     case (BinaryOp)`<Expr left> || <Expr right>`: return or(cst2ast(left), cst2ast(right), src=b.src);

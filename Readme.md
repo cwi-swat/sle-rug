@@ -37,7 +37,7 @@
 29. `VEnv cycve = initialEnv(cycaf);`
 30. `VEnv taxve = initialEnv(taxaf);`
 31. `VEnv errorsve = initialEnv(errorsaf);`
-32. `Input input1 = createInput("hasSoldHouse", vint(2));`
+32. `Input input1 = createInput("privateDebt", vint(500));`
 33. `cycve = eval(cycaf, input1, cycve);`
 
 ## For long output, do the following
