@@ -33,6 +33,13 @@
 26. `check(errorsaf, errorste, errorsrg.useDef);`
 27. `import Eval;`
 
+28. `VEnv binve = initialEnv(binaf);`
+29. `VEnv cycve = initialEnv(cycaf);`
+30. `VEnv taxve = initialEnv(taxaf);`
+31. `VEnv errorsve = initialEnv(errorsaf);`
+32. `Input input1 = createInput("hasSoldHouse", vint(2));`
+33. `cycve = eval(cycaf, input1, cycve);`
+
 ## For long output, do the following
 1. `import IO;`
 2. `iprintln($$$)`

@@ -3,7 +3,7 @@ form taxOfficeExample {
     hasBoughtHouse: boolean
     
   "Did you enter a loan?"
-    hasMaintLoan: boolean
+    hasMaintLoan: integer = 2 * 2
     
   if (hasSoldHouse) {
     "What was the selling price?"
@@ -17,7 +17,7 @@ form taxOfficeExample {
 
   if (privateDebt > 0) {
     "Did you sell a house in 2010?"
-       hasSoldHouse: boolean = 1
+       hasSoldHouse: boolean = true
   }
     
 

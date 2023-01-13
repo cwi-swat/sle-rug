@@ -2,6 +2,9 @@ module Eval
 
 import AST;
 import Resolve;
+import IO;
+import String;
+import Boolean;
 
 /*
  * Implement big-step semantics for QL
@@ -15,6 +18,7 @@ data Value
   = vint(int n)
   | vbool(bool b)
   | vstr(str s)
+  | vunknown()
   ;
 
 // The value environment
@@ -23,11 +27,25 @@ alias VEnv = map[str name, Value \value];
 // Modeling user input
 data Input
   = input(str question, Value \value);
-  
+
+Value defaultValue(AType aType) {
+  switch(aType.typeName) {
+    case "integer": return vint(0);
+    case "boolean": return vbool(false);
+    case "str":     return vstr("");
+
+    default: return vunknown();
+  }
+}
+
 // produce an environment which for each question has a default value
 // (e.g. 0 for int, "" for str etc.)
 VEnv initialEnv(AForm f) {
-  return ();
+  return (prompt.id.name : defaultValue(prompt.aType) | /question(str name, APrompt prompt) := f);
+}
+
+Input createInput(str question, Value \value){
+  return input(question, \value);
 }
 
 
@@ -40,21 +58,164 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
 }
 
 VEnv evalOnce(AForm f, Input inp, VEnv venv) {
-  return (); 
+  // Eval the questions
+  venv[inp.question] = inp.\value;
+  for (AQuestion q <- f.questions ){
+    venv = eval( q, inp, venv);
+  }
+  return venv;
 }
 
 VEnv eval(AQuestion q, Input inp, VEnv venv) {
   // evaluate conditions for branching,
   // evaluate inp and computed questions to return updated VEnv
-  return (); 
+  switch(q) {
+    case question(str name, APrompt prompt): {
+      return eval(prompt, inp, venv);
+    }
+    case question(AExpr expr,  list[AQuestion] questions, list[AElseStatement] elseStat): {
+      for(AQuestion q <- questions) {
+        venv = eval(q, inp, venv);
+      }
+      for(AElseStatement els <- elseStat) {
+        for(AQuestion q <- els.questions) {
+          venv = eval(q, inp, venv);
+        }
+      }
+    }
+  }
+
+  return venv; 
 }
 
-Value eval(AExpr e, VEnv venv) {
-  switch (e) {
-    case ref(id(str x)): return venv[x];
-    
-    // etc.
-    
-    default: throw "Unsupported expression <e>";
+VEnv eval(APrompt prompt, Input inp, VEnv venv) {
+  
+  switch(prompt) {
+    case prompt(AId id, AType aType, list[AExpr] expressions): {
+      for(AExpr e <- expressions) {
+        venv[prompt.id.name] = eval(e, venv);
+      }
+    }
   }
+  return venv;
 }
+
+Value eval(AExpr e, VEnv venv){
+  
+  switch(e){
+    case expr(ATerm aterm):
+      return eval(aterm, venv);
+
+    case exprPar(AExpr expr):
+      return eval(expr, venv);
+
+    case not(AExpr rhs):
+      return eval(rhs, venv);
+
+    case binaryOp(ABinaryOp binOperator):
+          return eval(binOperator, venv)  ;
+  
+  }
+
+  return vunknown();
+
+}
+
+Value eval(ABinaryOp bOp, VEnv venv){
+  
+  switch (bOp) {
+    case mul(AExpr lhs, AExpr rhs):{
+      return vint(eval(lhs, venv).n * eval(rhs, venv).n);
+    }
+    case div(AExpr lhs,  AExpr rhs):{
+      return vint( (eval(lhs, venv).n) / (eval(rhs, venv).n) );
+    }
+    case add(AExpr lhs,  AExpr rhs):{
+      return vint(eval(lhs, venv).n + eval(rhs, venv).n);
+    }
+    case sub(AExpr lhs,  AExpr rhs):{
+      return vint(eval(lhs, venv).n - eval(rhs, venv).n);
+    }
+    case greth(AExpr lhs,  AExpr rhs):{
+      return vunknown();
+    } 
+    case leth(AExpr lhs,  AExpr rhs):{
+      return vunknown();
+    }
+    case geq(AExpr lhs,  AExpr rhs):{
+      return vunknown();
+    }
+    case leq(AExpr lhs,  AExpr rhs): {
+      return vunknown();
+    }
+    case eq(AExpr lhs,  AExpr rhs): {
+      Value lhsVal = eval(lhs, venv);
+      Value rhsVal = eval(rhs, venv);
+      switch(lhsVal) {
+        case vint(_):
+          return vbool(lhsVal.n == rhsVal.n);
+        case vbool(_): 
+          return vbool(lhsVal.b == rhsVal.b);
+        case vstr(_):
+          return vbool(lhsVal.s == rhsVal.s);
+      }
+      return vunknown();
+    }
+    case neq(AExpr lhs,  AExpr rhs): {
+      Value lhsVal = eval(lhs, venv);
+      Value rhsVal = eval(rhs, venv);
+      switch(lhsVal) {
+        case vint(_):
+          return vbool(lhsVal.n != rhsVal.n);
+        case vbool(_): 
+          return vbool(lhsVal.b != rhsVal.b);
+        case vstr(_):
+          return vbool(lhsVal.s != rhsVal.s);
+      }
+      return vunknown();
+    }
+    case and(AExpr lhs,  AExpr rhs): {
+      Value lhsVal = eval(lhs, venv);
+      Value rhsVal = eval(rhs, venv);
+      switch(lhsVal) {
+        case vbool(_): 
+          return vbool(lhsVal.b && rhsVal.b);
+      }
+      return vunknown();
+    }
+    case or(AExpr lhs,  AExpr rhs): {
+      Value lhsVal = eval(lhs, venv);
+      Value rhsVal = eval(rhs, venv);
+      switch(lhsVal) {
+        case vbool(_): 
+          return vbool(lhsVal.b || rhsVal.b);
+      }
+      return vunknown();
+    }
+
+  }
+  return vunknown(); 
+}
+
+
+Value eval(ATerm t, VEnv venv){
+  switch (t) {
+    case term(id(str name)): {
+      return venv[name];
+    } 
+    case termInt(str integer): {
+      return vint(toInt(integer));
+    }
+    case termBool(str boolean): { 
+      return vbool(fromString(boolean));
+    }
+    case termStr(str string): {
+      return vstr(string);
+    }
+  }
+
+  return vunknown();
+}
+
+
+

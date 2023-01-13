@@ -144,7 +144,7 @@ set[Message] check(APrompt p, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
   
   switch (p) {
-    case prompt(AId id, AType aType, list[AExpr] expressions):{
+    case prompt(AId id, AType aType, list[AExpr] expressions): {
         for(AExpr e <- expressions) {
           //msgs += { error("Expression does not match type", p.src) | AExpr, t != tbool() };
           msgs +=  check(e, tenv, useDef);
