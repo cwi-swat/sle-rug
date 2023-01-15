@@ -1,0 +1,4 @@
+form testExample { 
+    "hello"
+        strtest: str                     
+}

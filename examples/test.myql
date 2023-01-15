@@ -1,10 +1,4 @@
 form testExample { 
-    "Did you buy a house in 2010?"
-        booltest: boolean = (1 < 2) && true
-
-    "Did you buy a house in 2011?"
-        inttest: integer = ((((1 + 2) * 3) + 5) - (10 / 2))
-
     "hello"
         strtest: str
     
