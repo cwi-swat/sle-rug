@@ -1,0 +1,76 @@
+<html>
+    <head>
+        taxOfficeExample
+    </head>
+    <body>
+        <p>"Did you buy a house in 2010?"</p>
+        <form>
+            <input type="checkbox">
+        </form>
+        <p>"Did you enter a loan?"</p>
+        <form>
+            <input type="checkbox" id = "ifCheck2" onclick='popupIf(this.id);'>
+        </form>
+        <p>"Did you sell a house in 2010?"</p>
+        <form>
+            <input type="checkbox" id = "hasSold" onclick='popupIf(this.id);'> 
+        </form>
+        <p>"What is the old address of the house"</p>
+        <form>
+            <input type="text">
+        </form>
+        <p>"What is the prive of you old house?"</p>
+        <form>
+            <input type="number">
+        </form>
+        <div id="IfStat" style="display:none">
+            <h2>IF Statement</h2>
+            <p>"What was the selling price?"</p>
+            <form>
+                <input type="number">
+            </form>
+            <p>"Private debts for the sold house:"</p>
+            <form>
+                <input type="number">
+            </form>
+            <p>"Value residue:"</p>
+            <form>
+                <input type="number">
+            </form>
+            <p>"What is the new address of the house"</p>
+            <form>
+                <input type="text">
+            </form>
+        </div><div id="IfStat2" style="display:none">
+            <h2>IF Statement</h2>
+            <p>"TEST ANOTHER POP UP?"</p>
+            <form>
+                <input type="number">
+            </form>
+            
+        </div><button>Submit taxOfficeExample</button>
+        <script>
+        function popupIf(id){
+          var checkBox = document.getElementById(id);
+          var ifStat = document.getElementById("IfStat");
+          var ifStat2 = document.getElementById("IfStat2");
+          if(checkBox.id == "ifCheck"){
+            if (checkBox.checked == true){
+              ifStat.style.display = "block";
+            } else {
+               ifStat.style.display = "none";
+            }
+          }
+          else{
+          	if (checkBox.checked == true){
+              ifStat2.style.display = "block";
+            } else {
+               ifStat2.style.display = "none";
+            }          
+          }
+}
+      
+        </script>
+        
+    </body>
+</html>

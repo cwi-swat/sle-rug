@@ -48,38 +48,71 @@ HTMLElement form2html(AForm f) {
   }
 
   elements += button([text("Submit " + f.name.name)]); 
-  return body(elements);
+  list[HTMLElement] parts = [];
+  parts += body(elements);
+  parts += giveScript(f);
+  return html(parts);
 }
 
-
+HTMLElement giveScript(AForm f) {
+  return script([], \src=f.src[extension="js"].file);
+}
 
 list[HTMLElement] question2html(AQuestion q) {
-  list[HTMLElement] elements = [];
-  list[HTMLElement] ifElseQuestion = [];
+  list[HTMLElement] elementQuestion = [];
+  list[HTMLElement] ifQuestion = [];
+  list[HTMLElement] elseQuestion = [];
 
-  switch(q) {
+  switch(q){
     case question(str name, APrompt prompt): {
-      elements += p([text(name)]);
-      elements += prompt2html(prompt);
+
+      elementQuestion += p([text(name)]);
+      elementQuestion += prompt2html(prompt);
     }
-    case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat): {
+
+    case question(AExpr expr,  list[AQuestion] questions, list[AElseStatement] elseStat): {
+      ifQuestion += h2([text("IF Statement")]);
       //If statemment Guard action
+
+       switch(expr){
+        case expr(ATerm aterm): {
+          println("test5");
+          println(aterm);
+          
+         }
+        }
+
+
+      // 1 ding (HasSold)
+      // list[popUpbool] = <hasSold, IfsStametemnt1>
+
+      //Expression
+      //list[popUpexpression] = <Epression, IfsStametemnt2>
+      //              > Expresiioin = id (.value) / value_int ("100") / bool (.checked) / str ("hello")  
+
+
+
       
       // Questions in if-statement
       for(AQuestion q <- questions) {
-        ifElseQuestion += question2html(q);
+        ifQuestion += question2html(q);
       }
       // Questions in else-statement
       for(AElseStatement els <- elseStat) {
         for(AQuestion q <- els.questions) {
-          ifElseQuestion += question2html(q);
+          elseQuestion += h2([text("ELSE Statement")]);
+          elseQuestion += question2html(q);
         }
       }
+      
     }
   }
 
-  if(ifElseQuestion != []){
-    elements += div(ifElseQuestion);
+  if(ifQuestion != []){
+    elementQuestion += div(ifQuestion);
+    if(elseQuestion != []){
+      elementQuestion += div(elseQuestion);
+    }
   }
 
   return elements;
@@ -136,7 +169,30 @@ list[HTMLElement] prompt2html(APrompt prompt) {
 }
 
 str form2js(AForm f) {
-  return "";
+  str code = "";
+
+  code += "valueMap = new Map();\n";
+
+  for (AQuestion q <- f.questions ){
+    code += question2string(q);
+  }
+
+  return code;
+}
+
+str question2string(q) {
+  str code = "";
+
+  switch(q) {
+    case question(str name, APrompt prompt): {
+      return "";
+    }
+    case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat):  {
+      return "";
+    }
+  }
+
+  return code;
 }
 
 void testing() {

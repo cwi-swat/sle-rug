@@ -2,6 +2,12 @@ form testExample {
     "hello"
         strtest: str
     
+    "nice"
+        inttest: integer = 5
+    
+    "this is a boolean"
+        booltest: boolean = true
+
     "or"
         boolor: boolean = (booltest || false)
 
