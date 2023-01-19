@@ -63,6 +63,9 @@ list[HTMLElement] question2html(AQuestion q) {
   list[HTMLElement] ifQuestion = [];
   list[HTMLElement] elseQuestion = [];
 
+  str elseId;
+  str ifId;
+
   switch(q){
     case question(str name, APrompt prompt): {
 
@@ -71,26 +74,21 @@ list[HTMLElement] question2html(AQuestion q) {
     }
 
     case question(AExpr expr,  list[AQuestion] questions, list[AElseStatement] elseStat): {
+      ifId = "IfStatement" + "<countIfElse>";
+      elseId = "elseStatement" + "<countIfElse>";
+      countIfElse = countIfElse + 1;
+      
       ifQuestion += h2([text("IF Statement")]);
+      
       //If statemment Guard action
-
        switch(expr){
         case expr(ATerm aterm): {
+          // If guard is a one term expression (Example: "hasSold")
           println("test5");
           println(aterm);
           
          }
         }
-
-
-      // 1 ding (HasSold)
-      // list[popUpbool] = <hasSold, IfsStametemnt1>
-
-      //Expression
-      //list[popUpexpression] = <Epression, IfsStametemnt2>
-      //              > Expresiioin = id (.value) / value_int ("100") / bool (.checked) / str ("hello")  
-
-
 
       
       // Questions in if-statement
@@ -109,9 +107,9 @@ list[HTMLElement] question2html(AQuestion q) {
   }
 
   if(ifQuestion != []){
-    elementQuestion += div(ifQuestion);
+    elementQuestion += div(ifQuestion, \id =ifId, \style = "display:none");
     if(elseQuestion != []){
-      elementQuestion += div(elseQuestion);
+      elementQuestion += div(elseQuestion, \id = elseId, \style = "display:none");
     }
   }
 
@@ -133,10 +131,11 @@ list[HTMLElement] prompt2html(APrompt prompt) {
     case "integer": {
       HTMLElement numberInput;
       if(readOnly) {
-        numberInput = input(\type = "number", readonly = "readonly");
+        numberInput = input(\type = "number", readonly = "readonly", \id = prompt.id.name, \value = "0");
+      elementsPrompt += form([numberInput]);
       }
       else {
-        numberInput = input(\type = "number");
+        numberInput = input(\type = "number", \id = prompt.id.name, \value = "0");
       }
       
       elements += form([numberInput]);
@@ -145,20 +144,20 @@ list[HTMLElement] prompt2html(APrompt prompt) {
     case "boolean": {
       HTMLElement boolInput;
       if(readOnly) {
-        boolInput = input(\type = "checkbox", disabled = "disable");
+        boolInput = input(\type = "checkbox", disabled = "disable", \id = prompt.id.name, \onclick = "popUpBool(this.id)");
       }
       else {
-        boolInput = input(\type = "checkbox");
+        boolInput = input(\type = "checkbox", \id = prompt.id.name, \onclick = "popUpBool(this.id)");
       }
       elements += form([boolInput]);
     }
     case "str": {
       HTMLElement textInput;
       if(readOnly) {
-        textInput = input(\type = "text", readonly = "readonly");
+        textInput = input(\type = "text", readonly = "readonly", \id = prompt.id.name);
       }
       else {
-        textInput = input(\type = "text");
+        textInput = input(\type = "text", \id = prompt.id.name);
       }
       elements += form([textInput]);
     }
