@@ -115,7 +115,7 @@ list[HTMLElement] question2html(AQuestion q) {
     }
   }
 
-  return elements;
+  return elementQuestion;
 }
 
 list[HTMLElement] prompt2html(APrompt prompt) {
@@ -180,14 +180,32 @@ str form2js(AForm f) {
   return code;
 }
 
-str question2string(q) {
+str question2string(AQuestion q) {
   str code = "";
 
   switch(q) {
     case question(str name, APrompt prompt): {
-      return "";
+      code += prompt2string(prompt);
     }
     case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat):  {
+      return "";
+    }
+  }
+
+  return code;
+}
+
+str prompt2string(APrompt prompt) {
+  str code = "";
+
+  switch(prompt.aType.typeName) {
+    case "integer": {
+      return "";
+    }
+    case "boolean": {
+      return "";
+    }
+    case "str": {
       return "";
     }
   }

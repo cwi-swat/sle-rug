@@ -9,19 +9,19 @@
         </form>
         <p>"Did you enter a loan?"</p>
         <form>
-            <input type="checkbox" id = "ifCheck2" onclick='popupIf(this.id);'>
+            <input type="checkbox">
         </form>
         <p>"Did you sell a house in 2010?"</p>
         <form>
-            <input type="checkbox" id = "hasSold" onclick='popupIf(this.id);'> 
+            <input type="checkbox" id = "hasSold" onclick='popupBool(this.id, true);'> 
         </form>
         <p>"What is the old address of the house"</p>
         <form>
             <input type="text">
         </form>
-        <p>"What is the prive of you old house?"</p>
+        <p>"What is the price of your old house?"</p>
         <form>
-            <input type="number">
+            <input type="number" id = "priceOld" value = "0">
         </form>
         <div id="IfStat" style="display:none">
             <h2>IF Statement</h2>
@@ -41,36 +41,41 @@
             <form>
                 <input type="text">
             </form>
-        </div><div id="IfStat2" style="display:none">
+        </div>
+        <div id="expression1" style="display:none">
             <h2>IF Statement</h2>
-            <p>"TEST ANOTHER POP UP?"</p>
+            <p>"You made profit!"</p>
             <form>
-                <input type="number">
+                <input type="checkbox">
             </form>
-            
-        </div><button>Submit taxOfficeExample</button>
+        </div>
+        <button onclick='popUpExpression();'>Submit taxOfficeExample </button>
+        
         <script>
-        function popupIf(id){
+        function popupBool(id, expr){
           var checkBox = document.getElementById(id);
           var ifStat = document.getElementById("IfStat");
           var ifStat2 = document.getElementById("IfStat2");
-          if(checkBox.id == "ifCheck"){
+          if(checkBox.id == "hasSold" && expr){
             if (checkBox.checked == true){
               ifStat.style.display = "block";
             } else {
                ifStat.style.display = "none";
             }
           }
-          else{
-          	if (checkBox.checked == true){
-              ifStat2.style.display = "block";
+		}
+        
+        function popUpExpression(){
+        	var checkExpr = document.getElementById("priceOld");
+        	var expr1 = document.getElementById("expression1");
+        	if(checkExpr.value > "100"){
+            	expr1.style.display = "block";
             } else {
-               ifStat2.style.display = "none";
-            }          
-          }
-}
+               expr1.style.display = "none";
+            }
+        
+        }
       
         </script>
-        
     </body>
 </html>
