@@ -22,8 +22,12 @@ import lang::html::IO;
 int countIfElseHTML = 1;
 int countIfElseJS = 1;
 
+int IS_INT = 0;
+int IS_BOOL = 1;
+int IS_STRING = 2;
+
 void compile(AForm f) {
-  //writeFile(f.src[extension="js"].top, form2js(f));
+  writeFile(f.src[extension="js"].top, form2js(f));
   writeFile(f.src[extension="html"].top, writeHTMLString(form2html(f)));
 }
 
@@ -50,7 +54,7 @@ HTMLElement form2html(AForm f) {
     elements += question2html(q);
   }
 
-  elements += button([text("Submit " + f.name.name)]); 
+  elements += button([text("Submit " + f.name.name)] \onclick = "refresh()"); 
   list[HTMLElement] parts = [];
   parts += body(elements);
   parts += giveScript(f);
@@ -135,12 +139,10 @@ list[HTMLElement] prompt2html(APrompt prompt) {
       HTMLElement numberInput;
       if(readOnly) {
         numberInput = input(\type = "number", readonly = "readonly", \id = prompt.id.name, \value = "0");
-      elements += form([numberInput]);
       }
       else {
         numberInput = input(\type = "number", \id = prompt.id.name, \value = "0");
       }
-      
       elements += form([numberInput]);
       //HTMLElement action = "intSubmission";
     }
@@ -150,7 +152,7 @@ list[HTMLElement] prompt2html(APrompt prompt) {
         boolInput = input(\type = "checkbox", disabled = "disable", \id = prompt.id.name, \onclick = "popUpBool(this.id)");
       }
       else {
-        boolInput = input(\type = "checkbox", \id = prompt.id.name, \onclick = "popUpBool(this.id)");
+        boolInput = input(\type = "checkbox", \id = prompt.id.name, \value = "false", \onclick = "popUpBool(this.id)");
       }
       elements += form([boolInput]);
     }
@@ -183,13 +185,16 @@ str form2js(AForm f) {
   '
   '
   'function popUpBool(id){
-  ' var checkBool = document.getElementById(id);
   ' <makePopUpBool(f)>
   '}
   '
-  'function popUpExpression(f){ 
+  'function popUpExpression(){ 
   '
   ' <makePopUpExpression(f)>
+  '}
+  '
+  ' function refresh() {
+  '   popUpExpression();  
   '}
   ";
 
@@ -204,29 +209,34 @@ str form2js(AForm f) {
 }
 
 str makePopUpBool(AForm f){
-  println("IN POp");
   str code = "";
 
+  code += "if(document.getElementById(id).value == \"false\") {\n  document.getElementById(id).value = \"true\";\n}\n";
+  code += "else if(document.getElementById(id).value == \"true\") {\n   document.getElementById(id).value = \"false\";\n}\n";
+  code += "popUpExpression(id);\n";
+
+  return code;
+}
+
+
+str makePopUpExpression(AForm f){
+  str code = "";
+  
   for (AQuestion q <- f.questions ){
     switch(q){
       case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat):  {
-        switch(expr){
-        case expr(ATerm aterm): {
-          str ifId = "IfStatement" + "<countIfElseJS>";
-          str elseId = "elseStatement" + "<countIfElseJS>";
-          countIfElseJS = countIfElseJS + 1;
-          str nameTerm = aterm.x.name;
-          code += "if(checkBox.id == \"";
-          code += nameTerm;
-          code +="\" && expr){
-                 '  if (checkBox.checked == true){
+        str ifId = "IfStatement" + "<countIfElseJS>";
+        str elseId = "elseStatement" + "<countIfElseJS>";
+        countIfElseJS = countIfElseJS + 1;
+        code += "if(" + expr2js(expr, IS_BOOL);
+          code +="){
                  '    document.getElementById(\"";
           code += ifId;
           code += "\").style.display = \"block\";
                  '    document.getElementById(\"";
           code += elseId;
           code += "\").style.display = \"none\";
-                 '  } else {
+                 ' } else {
                  '    document.getElementById(\"";
           code += ifId;
           code += "\").style.display = \"none\";
@@ -234,27 +244,9 @@ str makePopUpBool(AForm f){
           code += elseId;
           code += "\").style.display = \"block\";
                  '  }
-                 ' }
-                 ";                 
-          }
-        }
-      }
-    }
+                 ";                  
+        
 
-  }
-
-  return code;
-
-}
-
-
-str makePopUpExpression(AForm f){
-  str code = "";
-
-  for (AQuestion q <- f.questions ){
-    switch(q){
-      case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat):  {
-        code += expr2js(expr);
       }
     }
   }
@@ -263,51 +255,120 @@ str makePopUpExpression(AForm f){
 
 }
 
-
-str expr2js(AExpr e) {
+str expr2js(AExpr e, int ofType) {
   str code = "";
 
-  switch(expr) {
+  switch(e) {
     case expr(ATerm aterm):
-      code += term2js(aterm);
+      code += term2js(aterm, ofType);
 
     case exprPar(AExpr expr):
-      code += "(" + eval(expr, venv) + ")";
+      code += "(" + expr2js(expr, ofType) + ")";
 
     case not(AExpr rhs):
-      code += "!" + eval(expr, venv);
+      code += "!" + expr2js(rhs, IS_BOOL);
     
     case umin(AExpr rhs):
-      return vint(-eval(rhs, venv).n);
+      code += "-" + expr2js(rhs, IS_INT);
 
-    case binaryOp(ABinaryOp binOperator):
-      code += term2js(aterm);
+    case binaryOp(ABinaryOp bOp):
+      code += binaryOp2js(bOp);
   }
   return code;
 }
 
-str term2js(ATerm t) {
+str term2js(ATerm t, int ofType) {
   str code = "";
 
   switch(t) {
     case term(id(str name)): {
-      return venv[name];
+      code += "document.getElementById(\"" + name + "\").value";
+        if(ofType == IS_BOOL) {
+          code += " == \"true\"";
+        }
     } 
     case termInt(str integer): {
-      return vint(toInt(integer));
+      code += "\"" + integer + "\"";
     }
     case termBool(str boolean): { 
-      return vbool(fromString(boolean));
+      code += "\"" + boolean + "\"";
     }
     case termStr(str string): {
-      return vstr(string);
+      code += string;
     }
   }
 
   return code;
 }
 
+str binaryOp2js(ABinaryOp bOp) {
+  str code = "";
 
+  switch (bOp) {
+    case mul(AExpr lhs, AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " * ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case div(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " / ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case add(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " + ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case sub(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " - ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case greth(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " \> ";
+      code += expr2js(rhs, IS_INT);
+    } 
+    case leth(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " \< ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case geq(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " \>= ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case leq(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_INT);
+      code += " \<= ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case eqls(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_STRING);
+      code += " == ";
+      code += expr2js(rhs, IS_STRING);
+    }
+    case neq(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_STRING);
+      code += " != ";
+      code += expr2js(rhs, IS_STRING);
+    }
+    case and(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_BOOL);
+      code += " && ";
+      code += expr2js(rhs, IS_BOOL);
+    }
+    case or(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_BOOL);
+      code += " || ";
+      code += expr2js(rhs, IS_BOOL);
+    }
+  }
+
+  return code;
+}
 
 
 str prompt2js(APrompt prompt) {

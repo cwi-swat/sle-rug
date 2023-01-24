@@ -3,32 +3,26 @@ form testExample {
         strtest: str
     
     "nice"
-        inttest: integer = 5
+        inttest: integer
     
     "this is a boolean"
         booltest: boolean = true
 
-    "or"
-        boolor: boolean = (booltest || false)
-
-    "times"
-        inttimes: integer = inttest + 1
-
-    "again"
-        intagain: integer = inttimes * inttest
-
-    "equal"
-        strequal: boolean = strtest == "hello there"
-
-    "noteqaul"
-        strNotequal: boolean = strtest != "hello there"
-
-    "bigger"
-        biggerThan: boolean = 10 > 3
-
     "changeBool"
-        cBool: boolean 
+        cBool: boolean        
 
-    "changeBool2"
-        cBool2: boolean = true                           
+    if ((inttest * inttest) > 100) {
+        "What was the selling price?"
+            sellingPrice: integer
+    }  
+
+    if(cBool && ((inttest *inttest) > 100)) {
+        "hello there"
+            helloThere: integer
+    }
+
+    if(cBool) {
+        "wassup"
+            wasSupp: integer
+    }
 }
