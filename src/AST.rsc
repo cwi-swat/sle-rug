@@ -28,7 +28,7 @@ data AExpr(loc src = |tmp:///|)
   = expr(ATerm aterm)
   | exprPar(AExpr expr)
   | not(AExpr rhs)
-  //| umin(AExpr rhs)
+  | umin(AExpr rhs)
   | binaryOp(ABinaryOp binOperator)
   ;
 

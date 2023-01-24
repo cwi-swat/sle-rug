@@ -61,7 +61,7 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Term x>`: return expr(cst2ast(x), src=e.src);
     case (Expr)`( <Expr x> )`: return exprPar(cst2ast(x), src=e.src);
     case (Expr)`!<Expr right>`: return not(cst2ast(right), src=e.src);
-    //case (Expr)`-<Expr right>`: return umin(cst2ast(right), src=e.src); TODO: This gives an error
+    case (Expr)`-<Expr right>`: return umin(cst2ast(right), src=e.src);
     case (Expr) `<BinaryOp bOp>`: return binaryOp(cst2ast(bOp), src=e.src);
     
     

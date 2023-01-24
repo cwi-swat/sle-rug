@@ -110,7 +110,10 @@ Value eval(AExpr e, VEnv venv){
       return eval(expr, venv);
 
     case not(AExpr rhs):
-      return eval(rhs, venv);
+      return vbool(!eval(rhs, venv).b);
+    
+    case umin(AExpr rhs):
+      return vint(-eval(rhs, venv).n);
 
     case binaryOp(ABinaryOp binOperator):
           return eval(binOperator, venv)  ;

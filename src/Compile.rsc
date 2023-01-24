@@ -19,6 +19,9 @@ import lang::html::IO;
  * - if needed, use the name analysis to link uses to definitions
  */
 
+int countIfElseHTML = 1;
+int countIfElseJS = 1;
+
 void compile(AForm f) {
   //writeFile(f.src[extension="js"].top, form2js(f));
   writeFile(f.src[extension="html"].top, writeHTMLString(form2html(f)));
@@ -74,21 +77,21 @@ list[HTMLElement] question2html(AQuestion q) {
     }
 
     case question(AExpr expr,  list[AQuestion] questions, list[AElseStatement] elseStat): {
-      ifId = "IfStatement" + "<countIfElse>";
-      elseId = "elseStatement" + "<countIfElse>";
-      countIfElse = countIfElse + 1;
+      ifId = "IfStatement" + "<countIfElseHTML>";
+      elseId = "elseStatement" + "<countIfElseHTML>";
+      countIfElseHTML = countIfElseHTML + 1;
       
       ifQuestion += h2([text("IF Statement")]);
       
       //If statemment Guard action
-       switch(expr){
-        case expr(ATerm aterm): {
-          // If guard is a one term expression (Example: "hasSold")
-          println("test5");
-          println(aterm);
-          
-         }
+      switch(expr){
+      case expr(ATerm aterm): {
+        // If guard is a one term expression (Example: "hasSold")
+        println("test5");
+        println(aterm);
+        
         }
+      }
 
       
       // Questions in if-statement
@@ -132,7 +135,7 @@ list[HTMLElement] prompt2html(APrompt prompt) {
       HTMLElement numberInput;
       if(readOnly) {
         numberInput = input(\type = "number", readonly = "readonly", \id = prompt.id.name, \value = "0");
-      elementsPrompt += form([numberInput]);
+      elements += form([numberInput]);
       }
       else {
         numberInput = input(\type = "number", \id = prompt.id.name, \value = "0");
@@ -167,34 +170,147 @@ list[HTMLElement] prompt2html(APrompt prompt) {
   return elements;
 }
 
-str form2js(AForm f) {
-  str code = "";
+// For Javascript script
 
+str form2js(AForm f) {
+  str code = 
+  "valueMap = new Map();
+  '
+  '
+  '
+  '
+  '
+  '
+  '
+  'function popUpBool(id){
+  ' var checkBool = document.getElementById(id);
+  ' <makePopUpBool(f)>
+  '}
+  '
+  'function popUpExpression(f){ 
+  '
+  ' <makePopUpExpression(f)>
+  '}
+  ";
+
+  /*
   code += "valueMap = new Map();\n";
 
   for (AQuestion q <- f.questions ){
-    code += question2string(q);
-  }
+    code += question2js(q);
+  }*/
 
   return code;
 }
 
-str question2string(AQuestion q) {
+str makePopUpBool(AForm f){
+  println("IN POp");
   str code = "";
 
-  switch(q) {
-    case question(str name, APrompt prompt): {
-      code += prompt2string(prompt);
+  for (AQuestion q <- f.questions ){
+    switch(q){
+      case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat):  {
+        switch(expr){
+        case expr(ATerm aterm): {
+          str ifId = "IfStatement" + "<countIfElseJS>";
+          str elseId = "elseStatement" + "<countIfElseJS>";
+          countIfElseJS = countIfElseJS + 1;
+          str nameTerm = aterm.x.name;
+          code += "if(checkBox.id == \"";
+          code += nameTerm;
+          code +="\" && expr){
+                 '  if (checkBox.checked == true){
+                 '    document.getElementById(\"";
+          code += ifId;
+          code += "\").style.display = \"block\";
+                 '    document.getElementById(\"";
+          code += elseId;
+          code += "\").style.display = \"none\";
+                 '  } else {
+                 '    document.getElementById(\"";
+          code += ifId;
+          code += "\").style.display = \"none\";
+                 '    document.getElementById(\"";
+          code += elseId;
+          code += "\").style.display = \"block\";
+                 '  }
+                 ' }
+                 ";                 
+          }
+        }
+      }
     }
-    case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat):  {
-      return "";
+
+  }
+
+  return code;
+
+}
+
+
+str makePopUpExpression(AForm f){
+  str code = "";
+
+  for (AQuestion q <- f.questions ){
+    switch(q){
+      case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat):  {
+        code += expr2js(expr);
+      }
+    }
+  }
+
+  return code;
+
+}
+
+
+str expr2js(AExpr e) {
+  str code = "";
+
+  switch(expr) {
+    case expr(ATerm aterm):
+      code += term2js(aterm);
+
+    case exprPar(AExpr expr):
+      code += "(" + eval(expr, venv) + ")";
+
+    case not(AExpr rhs):
+      code += "!" + eval(expr, venv);
+    
+    case umin(AExpr rhs):
+      return vint(-eval(rhs, venv).n);
+
+    case binaryOp(ABinaryOp binOperator):
+      code += term2js(aterm);
+  }
+  return code;
+}
+
+str term2js(ATerm t) {
+  str code = "";
+
+  switch(t) {
+    case term(id(str name)): {
+      return venv[name];
+    } 
+    case termInt(str integer): {
+      return vint(toInt(integer));
+    }
+    case termBool(str boolean): { 
+      return vbool(fromString(boolean));
+    }
+    case termStr(str string): {
+      return vstr(string);
     }
   }
 
   return code;
 }
 
-str prompt2string(APrompt prompt) {
+
+
+
+str prompt2js(APrompt prompt) {
   str code = "";
 
   switch(prompt.aType.typeName) {
