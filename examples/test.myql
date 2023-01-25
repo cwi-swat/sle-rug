@@ -2,6 +2,9 @@ form testExample {
     "hello"
         strtest: str
     
+    "readonly int"
+        inttest2: integer = (10 * inttest) - 10
+
     "nice"
         inttest: integer
     
@@ -24,5 +27,14 @@ form testExample {
     if(cBool) {
         "wassup"
             wasSupp: integer
+    }
+    else {
+        "bool is false"
+            boolIsFalse: integer
+    }
+
+    if(strtest == "hello") {
+        "string is hello"
+            stringIsHello: integer
     }
 }

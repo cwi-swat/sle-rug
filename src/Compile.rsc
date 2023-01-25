@@ -54,7 +54,7 @@ HTMLElement form2html(AForm f) {
     elements += question2html(q);
   }
 
-  elements += button([text("Submit " + f.name.name)] \onclick = "popUpExpression()"); 
+  elements += button([text("Submit " + f.name.name)] \onclick = "refresh()"); 
   list[HTMLElement] parts = [];
   parts += body(elements);
   parts += giveScript(f);
@@ -126,19 +126,25 @@ list[HTMLElement] question2html(AQuestion q) {
 list[HTMLElement] prompt2html(APrompt prompt) {
   list[HTMLElement] elements = [];
   bool readOnly = false;
+  str insertValue = "0";
 
   /* There is an expression so it should be read and not written */
   //println(prompt.expressions);
 
   if(prompt.expressions != []) {
     readOnly = true;
+    for(expr <- prompt.expressions) {
+      insertValue = expr2js(expr, IS_STRING);
+    }
   }
+
+  println(insertValue);
 
   switch(prompt.aType.typeName) {
     case "integer": {
       HTMLElement numberInput;
       if(readOnly) {
-        numberInput = input(\type = "number", readonly = "readonly", \id = prompt.id.name, \value = "0");
+        numberInput = input(\type = "number", readonly = "readonly", \id = prompt.id.name, \value = "<insertValue>");
       }
       else {
         numberInput = input(\type = "number", \id = prompt.id.name, \value = "0");
@@ -172,18 +178,105 @@ list[HTMLElement] prompt2html(APrompt prompt) {
   return elements;
 }
 
+str expr2string(AExpr e) {
+  str code = "";
+
+  switch(e) {
+    case expr(ATerm aterm):
+      code += term2str(aterm);
+
+    case exprPar(AExpr expr):
+      code += "(" + expr2string(expr) + ")";
+
+    case not(AExpr rhs):
+      code += "!" + expr2string(rhs);
+    
+    case umin(AExpr rhs):
+      code += "-" + expr2string(rhs);
+
+    case binaryOp(ABinaryOp bOp):
+      code += binaryOp2js(bOp);
+  }
+  return code;
+}
+
+str binaryOp2str(ABinaryOp bOp) {
+  str code = "";
+
+  switch (bOp) {
+    case mul(AExpr lhs, AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " * ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case div(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " / ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case add(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " + ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case sub(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " - ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case greth(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " \> ";
+      code += expr2js(rhs, IS_INT);
+    } 
+    case leth(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " \< ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case geq(AExpr lhs,  AExpr rhs):{
+      code += expr2js(lhs, IS_INT);
+      code += " \>= ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case leq(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_INT);
+      code += " \<= ";
+      code += expr2js(rhs, IS_INT);
+    }
+    case eqls(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_STRING);
+      code += " == ";
+      code += expr2js(rhs, IS_STRING);
+    }
+    case neq(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_STRING);
+      code += " != ";
+      code += expr2js(rhs, IS_STRING);
+    }
+    case and(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_BOOL);
+      code += " && ";
+      code += expr2js(rhs, IS_BOOL);
+    }
+    case or(AExpr lhs,  AExpr rhs): {
+      code += expr2js(lhs, IS_BOOL);
+      code += " || ";
+      code += expr2js(rhs, IS_BOOL);
+    }
+  }
+
+  return code;
+}
+
+
+
+
 // For Javascript script
 
 str form2js(AForm f) {
   str code = 
-  "valueMap = new Map();
-  '
-  '
-  '
-  '
-  '
-  '
-  '
+  "
   'function popUpBool(id){
   ' <makePopUpBool(f)>
   '}
@@ -192,7 +285,16 @@ str form2js(AForm f) {
   '
   ' <makePopUpExpression(f)>
   '}
+  'function setValues(){
+  ' <makeSetValues(f)>
+  '}
   '
+  'function refresh(){
+  ' setValues();
+  ' popUpExpression();
+  '}
+  '
+  'refresh();
   ";
 
   /*
@@ -220,7 +322,42 @@ str makePopUpExpression(AForm f){
   str code = "";
   
   for (AQuestion q <- f.questions ){
-    switch(q){
+    code += question2js(q);
+  }
+
+  return code;
+
+}
+
+str makeSetValues(AForm f) {
+  str code = "";
+  
+  for(/APrompt p := f) {
+    code += promptSetValue(p);
+  }
+
+  return code;
+}
+
+str promptSetValue(APrompt p) {
+  str code = "";
+
+  switch (p) {
+    case prompt(AId id, AType aType, list[AExpr] expressions): {
+        for(AExpr e <- expressions) {
+          code += "document.getElementById(\"" + id.name + "\").value = ";
+          code += expr2js(e, IS_STRING);
+          code += "\n";
+        }
+    }
+  }
+
+  return code;
+}
+
+str question2js(AQuestion q) {
+  str code = "";
+  switch(q){
       case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat):  {
         str ifId = "IfStatement" + "<countIfElseJS>";
         str elseId = "elseStatement" + "<countIfElseJS>";
@@ -233,12 +370,18 @@ str makePopUpExpression(AForm f){
           code += ifId;
           
           code += "\").style.display = \"block\";";
-          
+
           if(hasElse) {
             code += "    document.getElementById(\"";         
             code += elseId;
             code += "\").style.display = \"none\";";
           }
+
+          // Loop over list of question of if 
+          for(AQuestion question <- questions) {
+            code += question2js(question);
+          }
+
                  
           code += " 
                   '} 
@@ -252,19 +395,22 @@ str makePopUpExpression(AForm f){
             code += elseId;
             code += "\").style.display = \"block\";";            
           }
+
+          // Loop over list of question of else
+          for(AElseStatement els <- elseStat) {
+            for(AQuestion question <- els.questions) {
+              code += question2js(question);
+            }
+          }
+
           
           code += " 
                   '}
                   ' 
                   '"; 
-          
-
       }
     }
-  }
-
-  return code;
-
+    return code;
 }
 
 str expr2js(AExpr e, int ofType) {
@@ -300,7 +446,7 @@ str term2js(ATerm t, int ofType) {
         }
     } 
     case termInt(str integer): {
-      code += "\"" + integer + "\"";
+      code += integer;
     }
     case termBool(str boolean): { 
       code += "\"" + boolean + "\"";
