@@ -14,6 +14,9 @@ form testExample {
     "changeBool"
         cBool: boolean        
 
+    "this is an or"
+        orBool: boolean = booltest && cBool
+
     if ((inttest * inttest) > 100) {
         "What was the selling price?"
             sellingPrice: integer

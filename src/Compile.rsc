@@ -178,100 +178,6 @@ list[HTMLElement] prompt2html(APrompt prompt) {
   return elements;
 }
 
-str expr2string(AExpr e) {
-  str code = "";
-
-  switch(e) {
-    case expr(ATerm aterm):
-      code += term2str(aterm);
-
-    case exprPar(AExpr expr):
-      code += "(" + expr2string(expr) + ")";
-
-    case not(AExpr rhs):
-      code += "!" + expr2string(rhs);
-    
-    case umin(AExpr rhs):
-      code += "-" + expr2string(rhs);
-
-    case binaryOp(ABinaryOp bOp):
-      code += binaryOp2js(bOp);
-  }
-  return code;
-}
-
-str binaryOp2str(ABinaryOp bOp) {
-  str code = "";
-
-  switch (bOp) {
-    case mul(AExpr lhs, AExpr rhs):{
-      code += expr2js(lhs, IS_INT);
-      code += " * ";
-      code += expr2js(rhs, IS_INT);
-    }
-    case div(AExpr lhs,  AExpr rhs):{
-      code += expr2js(lhs, IS_INT);
-      code += " / ";
-      code += expr2js(rhs, IS_INT);
-    }
-    case add(AExpr lhs,  AExpr rhs):{
-      code += expr2js(lhs, IS_INT);
-      code += " + ";
-      code += expr2js(rhs, IS_INT);
-    }
-    case sub(AExpr lhs,  AExpr rhs):{
-      code += expr2js(lhs, IS_INT);
-      code += " - ";
-      code += expr2js(rhs, IS_INT);
-    }
-    case greth(AExpr lhs,  AExpr rhs):{
-      code += expr2js(lhs, IS_INT);
-      code += " \> ";
-      code += expr2js(rhs, IS_INT);
-    } 
-    case leth(AExpr lhs,  AExpr rhs):{
-      code += expr2js(lhs, IS_INT);
-      code += " \< ";
-      code += expr2js(rhs, IS_INT);
-    }
-    case geq(AExpr lhs,  AExpr rhs):{
-      code += expr2js(lhs, IS_INT);
-      code += " \>= ";
-      code += expr2js(rhs, IS_INT);
-    }
-    case leq(AExpr lhs,  AExpr rhs): {
-      code += expr2js(lhs, IS_INT);
-      code += " \<= ";
-      code += expr2js(rhs, IS_INT);
-    }
-    case eqls(AExpr lhs,  AExpr rhs): {
-      code += expr2js(lhs, IS_STRING);
-      code += " == ";
-      code += expr2js(rhs, IS_STRING);
-    }
-    case neq(AExpr lhs,  AExpr rhs): {
-      code += expr2js(lhs, IS_STRING);
-      code += " != ";
-      code += expr2js(rhs, IS_STRING);
-    }
-    case and(AExpr lhs,  AExpr rhs): {
-      code += expr2js(lhs, IS_BOOL);
-      code += " && ";
-      code += expr2js(rhs, IS_BOOL);
-    }
-    case or(AExpr lhs,  AExpr rhs): {
-      code += expr2js(lhs, IS_BOOL);
-      code += " || ";
-      code += expr2js(rhs, IS_BOOL);
-    }
-  }
-
-  return code;
-}
-
-
-
-
 // For Javascript script
 
 str form2js(AForm f) {
@@ -288,6 +194,7 @@ str form2js(AForm f) {
   'function setValues(){
   ' <makeSetValues(f)>
   '}
+  '
   '
   'function refresh(){
   ' setValues();
@@ -348,8 +255,28 @@ str promptSetValue(APrompt p) {
           code += "document.getElementById(\"" + id.name + "\").value = ";
           code += expr2js(e, IS_STRING);
           code += "\n";
+          if(aType.typeName == "boolean") {
+            code += "if(document.getElementById(\"" + id.name + "\").value == \"true\")";
+            code += "{
+                  ' document.getElementById(\"" + id.name + "\").checked = true;";
+            code += "
+                    '} \n";
+            code += "else {
+                    ' document.getElementById(\"" + id.name + "\").checked = false;
+                    '} \n";
+          }
         }
     }
+  }
+
+  return code;
+}
+
+str makeSetBools(AForm f) {
+  str code = "";
+  
+  for(/APrompt p := f) {
+    code += promptSetValue(p);
   }
 
   return code;
