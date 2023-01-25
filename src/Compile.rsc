@@ -54,7 +54,7 @@ HTMLElement form2html(AForm f) {
     elements += question2html(q);
   }
 
-  elements += button([text("Submit " + f.name.name)] \onclick = "refresh()"); 
+  elements += button([text("Submit " + f.name.name)] \onclick = "popUpExpression()"); 
   list[HTMLElement] parts = [];
   parts += body(elements);
   parts += giveScript(f);
@@ -193,9 +193,6 @@ str form2js(AForm f) {
   ' <makePopUpExpression(f)>
   '}
   '
-  ' function refresh() {
-  '   popUpExpression();  
-  '}
   ";
 
   /*
@@ -213,7 +210,7 @@ str makePopUpBool(AForm f){
 
   code += "if(document.getElementById(id).value == \"false\") {\n  document.getElementById(id).value = \"true\";\n}\n";
   code += "else if(document.getElementById(id).value == \"true\") {\n   document.getElementById(id).value = \"false\";\n}\n";
-  code += "popUpExpression(id);\n";
+  code += "popUpExpression();\n";
 
   return code;
 }
@@ -227,25 +224,40 @@ str makePopUpExpression(AForm f){
       case question(AExpr expr, list[AQuestion] questions, list[AElseStatement] elseStat):  {
         str ifId = "IfStatement" + "<countIfElseJS>";
         str elseId = "elseStatement" + "<countIfElseJS>";
+        bool hasElse = (elseStat != []);
         countIfElseJS = countIfElseJS + 1;
         code += "if(" + expr2js(expr, IS_BOOL);
           code +="){
                  '    document.getElementById(\"";
+                 
           code += ifId;
-          code += "\").style.display = \"block\";
-                 '    document.getElementById(\"";
-          code += elseId;
-          code += "\").style.display = \"none\";
-                 ' } else {
-                 '    document.getElementById(\"";
+          
+          code += "\").style.display = \"block\";";
+          
+          if(hasElse) {
+            code += "    document.getElementById(\"";         
+            code += elseId;
+            code += "\").style.display = \"none\";";
+          }
+                 
+          code += " 
+                  '} 
+                  'else {
+                  '    document.getElementById(\"";
           code += ifId;
-          code += "\").style.display = \"none\";
-                 '    document.getElementById(\"";
-          code += elseId;
-          code += "\").style.display = \"block\";
-                 '  }
-                 ";                  
-        
+          code += "\").style.display = \"none\";";
+          
+          if (hasElse) {
+            code += "document.getElementById(\"";
+            code += elseId;
+            code += "\").style.display = \"block\";";            
+          }
+          
+          code += " 
+                  '}
+                  ' 
+                  '"; 
+          
 
       }
     }
