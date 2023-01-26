@@ -86,26 +86,15 @@ list[HTMLElement] question2html(AQuestion q) {
       countIfElseHTML = countIfElseHTML + 1;
       
       ifQuestion += h2([text("IF Statement")]);
-      
-      //If statemment Guard action
-      switch(expr){
-      case expr(ATerm aterm): {
-        // If guard is a one term expression (Example: "hasSold")
-        println("test5");
-        println(aterm);
-        
-        }
-      }
 
-      
       // Questions in if-statement
       for(AQuestion q <- questions) {
         ifQuestion += question2html(q);
       }
       // Questions in else-statement
       for(AElseStatement els <- elseStat) {
+        elseQuestion += h2([text("ELSE Statement")]);
         for(AQuestion q <- els.questions) {
-          elseQuestion += h2([text("ELSE Statement")]);
           elseQuestion += question2html(q);
         }
       }
@@ -155,10 +144,12 @@ list[HTMLElement] prompt2html(APrompt prompt) {
     case "boolean": {
       HTMLElement boolInput;
       if(readOnly) {
-        boolInput = input(\type = "checkbox", disabled = "disable", \id = prompt.id.name, \onclick = "popUpBool(this.id)");
+        //boolInput = input(\type = "checkbox", disabled = "disable", \value = "default", \id = prompt.id.name, \onclick = "popUpBool(this.id)");
+        boolInput = select([option([text("-")], \value = "default"), option([text("Yes")], \value = "true"), option([text("No")], \value = "false")], \id = prompt.id.name, disabled = "disable");
       }
       else {
-        boolInput = input(\type = "checkbox", \id = prompt.id.name, \value = "false", \onclick = "popUpBool(this.id)");
+        //boolInput = input(\type = "checkbox", \id = prompt.id.name, \value = "default", \onclick = "popUpBool(this.id)");
+        boolInput = select([option([text("-")], \id = prompt.id.name, \value = "default"), option([text("Yes")], \value = "true"), option([text("No")], \value = "false")], \id = prompt.id.name);
       }
       elements += form([boolInput]);
     }
@@ -217,7 +208,7 @@ str form2js(AForm f) {
 str makePopUpBool(AForm f){
   str code = "";
 
-  code += "if(document.getElementById(id).value == \"false\") {\n  document.getElementById(id).value = \"true\";\n}\n";
+  code += "if(document.getElementById(id).value == \"false\" || document.getElementById(id).value == \"default\") {\n  document.getElementById(id).value = \"true\";\n}\n";
   code += "else if(document.getElementById(id).value == \"true\") {\n   document.getElementById(id).value = \"false\";\n}\n";
   code += "popUpExpression();\n";
 
@@ -258,11 +249,11 @@ str promptSetValue(APrompt p) {
           if(aType.typeName == "boolean") {
             code += "if(document.getElementById(\"" + id.name + "\").value == \"true\")";
             code += "{
-                  ' document.getElementById(\"" + id.name + "\").checked = true;";
+                  ' document.getElementById(\"" + id.name + "\").selected = \"true\";";
             code += "
                     '} \n";
             code += "else {
-                    ' document.getElementById(\"" + id.name + "\").checked = false;
+                    ' document.getElementById(\"" + id.name + "\").selected = \"false\";
                     '} \n";
           }
         }
@@ -312,7 +303,7 @@ str question2js(AQuestion q) {
                  
           code += " 
                   '} 
-                  'else {
+                  'else if(" + expr2js(expr, IS_STRING) + " == \"false\") {
                   '    document.getElementById(\"";
           code += ifId;
           code += "\").style.display = \"none\";";
