@@ -84,8 +84,7 @@ list[HTMLElement] question2html(AQuestion q) {
       ifId = "IfStatement" + "<countIfElseHTML>";
       elseId = "elseStatement" + "<countIfElseHTML>";
       countIfElseHTML = countIfElseHTML + 1;
-      
-      ifQuestion += h2([text("IF Statement")]);
+    
 
       // Questions in if-statement
       for(AQuestion q <- questions) {
@@ -93,7 +92,6 @@ list[HTMLElement] question2html(AQuestion q) {
       }
       // Questions in else-statement
       for(AElseStatement els <- elseStat) {
-        elseQuestion += h2([text("ELSE Statement")]);
         for(AQuestion q <- els.questions) {
           elseQuestion += question2html(q);
         }
@@ -126,8 +124,6 @@ list[HTMLElement] prompt2html(APrompt prompt) {
       insertValue = expr2js(expr, IS_STRING);
     }
   }
-
-  println(insertValue);
 
   switch(prompt.aType.typeName) {
     case "integer": {
@@ -303,7 +299,7 @@ str question2js(AQuestion q) {
                  
           code += " 
                   '} 
-                  'else if(" + expr2js(expr, IS_STRING) + " == \"false\") {
+                  'else if(!(" + expr2js(expr, IS_BOOL) + ") && (" + expr2js(expr, IS_STRING) + ") != \"default\") {
                   '    document.getElementById(\"";
           code += ifId;
           code += "\").style.display = \"none\";";
