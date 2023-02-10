@@ -19,37 +19,38 @@ import lang::html::IO;
  * - if needed, use the name analysis to link uses to definitions
  */
 
+/* Global variables for the labels of the if/else sections */
 int countIfElseHTML = 1;
 int countIfElseJS = 1;
 
+/* Global varaibales for checking the type of a prompt */
 int IS_INT = 0;
 int IS_BOOL = 1;
 int IS_STRING = 2;
 
+
+/* 
+ * Main function for creating .hmtl and .js file from AForm file 
+ */
 void compile(AForm f) {
   writeFile(f.src[extension="js"].top, form2js(f));
   writeFile(f.src[extension="html"].top, writeHTMLString(form2html(f)));
 }
 
-/* HTMLElement e = text("Hello World!"); 
-writeHTMLString(e);
-str: "\<html\>\n    \<head\>\</head\>\n    \<body\>\n        Hello World!\n    \</body\>\n\</html\>"
----
-<html>
-    <head></head>
-    <body>
-        Hello World!
-    </body>
-</html>
----
-*/
+/* 
+ * Code for the HTML script
+ */
 
 
+/* 
+ * Returns HTML Element of the whole AFrom
+ */
 HTMLElement form2html(AForm f) {
   list[HTMLElement] elements = [];
 
   elements += head([text(f.name.name)]);
   
+  /* Adds list of HTML Elements of each question to the list of HTML Elements */
   for (AQuestion q <- f.questions ){
     elements += question2html(q);
   }
@@ -61,10 +62,16 @@ HTMLElement form2html(AForm f) {
   return html(parts);
 }
 
+/* 
+ * Returns HTML Element script of the js file that is linked to the AForm, and therefore the HTML file
+ */
 HTMLElement giveScript(AForm f) {
   return script([], \src=f.src[extension="js"].file);
 }
 
+/* 
+ * Returns a list of HTML Elements of a question
+ */
 list[HTMLElement] question2html(AQuestion q) {
   list[HTMLElement] elementQuestion = [];
   list[HTMLElement] ifQuestion = [];
@@ -75,22 +82,24 @@ list[HTMLElement] question2html(AQuestion q) {
 
   switch(q){
     case question(str name, APrompt prompt): {
-
+      /* Adds HTML Elements of prompt to the list */
       elementQuestion += p([text(name)]);
       elementQuestion += prompt2html(prompt);
     }
 
     case question(AExpr expr,  list[AQuestion] questions, list[AElseStatement] elseStat): {
+      /* Creates labels for div-section HTML of if/else statement */
       ifId = "IfStatement" + "<countIfElseHTML>";
       elseId = "elseStatement" + "<countIfElseHTML>";
+
+      /* Increase the amount of labels*/ 
       countIfElseHTML = countIfElseHTML + 1;
     
-
-      // Questions in if-statement
+      /* The HTML Elements of each question in if-statement added to if-list */
       for(AQuestion q <- questions) {
         ifQuestion += question2html(q);
       }
-      // Questions in else-statement
+      /* The HTML Elements of each question in else-statement added to else-list */
       for(AElseStatement els <- elseStat) {
         for(AQuestion q <- els.questions) {
           elseQuestion += question2html(q);
@@ -101,8 +110,10 @@ list[HTMLElement] question2html(AQuestion q) {
   }
 
   if(ifQuestion != []){
+    /* Adds div HTML Element to if statement */ 
     elementQuestion += div(ifQuestion, \id =ifId, \style = "display:none");
     if(elseQuestion != []){
+      /* Adds div HTML Element to else statement */ 
       elementQuestion += div(elseQuestion, \id = elseId, \style = "display:none");
     }
   }
@@ -110,14 +121,15 @@ list[HTMLElement] question2html(AQuestion q) {
   return elementQuestion;
 }
 
+/* 
+ * Returns a list of HTML Elements of a prompt
+ */
 list[HTMLElement] prompt2html(APrompt prompt) {
   list[HTMLElement] elements = [];
   bool readOnly = false;
   str insertValue = "0";
 
   /* There is an expression so it should be read and not written */
-  //println(prompt.expressions);
-
   if(prompt.expressions != []) {
     readOnly = true;
     for(expr <- prompt.expressions) {
@@ -135,16 +147,13 @@ list[HTMLElement] prompt2html(APrompt prompt) {
         numberInput = input(\type = "number", \id = prompt.id.name, \value = "0");
       }
       elements += form([numberInput]);
-      //HTMLElement action = "intSubmission";
     }
     case "boolean": {
       HTMLElement boolInput;
       if(readOnly) {
-        //boolInput = input(\type = "checkbox", disabled = "disable", \value = "default", \id = prompt.id.name, \onclick = "popUpBool(this.id)");
         boolInput = select([option([text("-")], \value = "default"), option([text("Yes")], \value = "true"), option([text("No")], \value = "false")], \id = prompt.id.name, disabled = "disable");
       }
       else {
-        //boolInput = input(\type = "checkbox", \id = prompt.id.name, \value = "default", \onclick = "popUpBool(this.id)");
         boolInput = select([option([text("-")], \id = prompt.id.name, \value = "default"), option([text("Yes")], \value = "true"), option([text("No")], \value = "false")], \id = prompt.id.name);
       }
       elements += form([boolInput]);
@@ -165,8 +174,14 @@ list[HTMLElement] prompt2html(APrompt prompt) {
   return elements;
 }
 
-// For Javascript script
 
+/* 
+ * Code for the Javascript script
+ */
+
+/* 
+ * Creation of the javascript file
+ */
 str form2js(AForm f) {
   str code = 
   "
@@ -178,6 +193,8 @@ str form2js(AForm f) {
   '
   ' <makePopUpExpression(f)>
   '}
+  '
+  '
   'function setValues(){
   ' <makeSetValues(f)>
   '}
@@ -191,16 +208,13 @@ str form2js(AForm f) {
   'refresh();
   ";
 
-  /*
-  code += "valueMap = new Map();\n";
-
-  for (AQuestion q <- f.questions ){
-    code += question2js(q);
-  }*/
-
   return code;
 }
 
+/* 
+ * Javascript script for the popUpBool(id) function
+ * popUpBool(id) handels the actions for the if and else statements
+ */
 str makePopUpBool(AForm f){
   str code = "";
 
@@ -211,7 +225,10 @@ str makePopUpBool(AForm f){
   return code;
 }
 
-
+/* 
+ * Javascript script for the popUpExpression() function
+ * popUpExpression() handels the actions for the expressions
+ */
 str makePopUpExpression(AForm f){
   str code = "";
   
@@ -223,16 +240,24 @@ str makePopUpExpression(AForm f){
 
 }
 
+/* 
+ * Javascript script for the setValues() function
+ * setValues() handels setting the values of the prompts 
+ */
 str makeSetValues(AForm f) {
   str code = "";
   
   for(/APrompt p := f) {
+    /* Adds the code for setting values of each prompt */
     code += promptSetValue(p);
   }
 
   return code;
 }
 
+/* 
+ * Javascript script for setting the values of the prompts 
+ */
 str promptSetValue(APrompt p) {
   str code = "";
 
@@ -259,16 +284,9 @@ str promptSetValue(APrompt p) {
   return code;
 }
 
-str makeSetBools(AForm f) {
-  str code = "";
-  
-  for(/APrompt p := f) {
-    code += promptSetValue(p);
-  }
-
-  return code;
-}
-
+/* 
+ * Javascript script for setting the values of the prompts 
+ */
 str question2js(AQuestion q) {
   str code = "";
   switch(q){
@@ -291,12 +309,11 @@ str question2js(AQuestion q) {
             code += "\").style.display = \"none\";";
           }
 
-          // Loop over list of question of if 
+          /* Loop over list of questions of if statement */
           for(AQuestion question <- questions) {
             code += question2js(question);
           }
-
-                 
+                
           code += " 
                   '} 
                   'else if(!(" + expr2js(expr, IS_BOOL) + ") && (" + expr2js(expr, IS_STRING) + ") != \"default\") {
@@ -304,13 +321,14 @@ str question2js(AQuestion q) {
           code += ifId;
           code += "\").style.display = \"none\";";
           
+          /* Add javascript if else statement exists */
           if (hasElse) {
             code += "document.getElementById(\"";
             code += elseId;
             code += "\").style.display = \"block\";";            
           }
 
-          // Loop over list of question of else
+          /* Loop over list of questions of else statement*/
           for(AElseStatement els <- elseStat) {
             for(AQuestion question <- els.questions) {
               code += question2js(question);
@@ -327,6 +345,9 @@ str question2js(AQuestion q) {
     return code;
 }
 
+/* 
+ * Javascript script for expressions
+ */
 str expr2js(AExpr e, int ofType) {
   str code = "";
 
@@ -349,6 +370,9 @@ str expr2js(AExpr e, int ofType) {
   return code;
 }
 
+/* 
+ * Javascript script for term
+ */
 str term2js(ATerm t, int ofType) {
   str code = "";
 
@@ -373,6 +397,9 @@ str term2js(ATerm t, int ofType) {
   return code;
 }
 
+/* 
+ * Javascript script for expressions with binary operators
+ */
 str binaryOp2js(ABinaryOp bOp) {
   str code = "";
 
@@ -443,25 +470,4 @@ str binaryOp2js(ABinaryOp bOp) {
 }
 
 
-str prompt2js(APrompt prompt) {
-  str code = "";
 
-  switch(prompt.aType.typeName) {
-    case "integer": {
-      return "";
-    }
-    case "boolean": {
-      return "";
-    }
-    case "str": {
-      return "";
-    }
-  }
-
-  return code;
-}
-
-void testing() {
-  HTMLElement el = form([], \type = "number");
-  println(writeHTMLString(el));
-}

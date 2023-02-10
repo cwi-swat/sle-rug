@@ -7,15 +7,15 @@ import AST;
  */ 
 
 
-// modeling declaring occurrences of names
+/* modeling declaring occurrences of names */
 alias Def = rel[str name, loc def];
 
-// modeling use occurrences of names
+/* modeling use occurrences of names */
 alias Use = rel[loc use, str name];
 
 alias UseDef = rel[loc use, loc def];
 
-// the reference graph
+/* the reference graph */
 alias RefGraph = tuple[
   Use uses,
   Def defs, 

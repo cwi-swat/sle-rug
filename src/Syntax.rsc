@@ -6,11 +6,10 @@ extend lang::std::Id;
 /*
  * Concrete syntax of QL
  */
-
 start syntax Form 
   = "form" Id "{" Question* "}"; 
 
-// TODO: question, computed question, block, if-then-else, if-then
+/* TODO: question, computed question, block, if-then-else, if-then */
 syntax Question = StrLiteral Prompt
                 | "if" "(" Expr ")" "{" Question* "}" ElseStatement?
                 ;
@@ -20,9 +19,11 @@ syntax ElseStatement  = "else" "{" Question* "}"
 
 syntax Prompt = Id ":" Type ("=" Expr)?;
 
-// TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
-// Think about disambiguation using priorities and associativity
-// and use C/Java style precedence rules (look it up on the internet)
+/*
+ * TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
+ * Think about disambiguation using priorities and associativity
+ * and use C/Java style precedence rules (look it up on the internet)
+ */
 syntax Expr 
   = Term
   | "(" Expr ")"
@@ -30,13 +31,6 @@ syntax Expr
           | umin: "-" Expr e )
   > binaryOp: BinaryOp
   ;
-
-
-// 1 + 2 * 3
-// Lhs = ? and rhs ? 
-// *3 > rhs =3 and lhs= 2
-// lhs = 1, rhs = > 2 * 3
-
 
 syntax BinaryOp
   = left  ( mul: Expr l "*" Expr r
@@ -66,12 +60,12 @@ syntax Term
   | BoolLiteral
   ;
 
+/* literals */
 lexical Str = "str";
 syntax StrLiteral =  [\"] ![\"]* [\"];
 
 lexical Int = "integer";
 syntax IntLiteral = [0-9]+;
-
 
 lexical Bool = "boolean";
 syntax BoolLiteral = "true" | "false";

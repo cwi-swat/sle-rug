@@ -10,10 +10,10 @@ import Boolean;
  * Implement big-step semantics for QL
  */
  
-// NB: Eval may assume the form is type- and name-correct.
+/* NB: Eval may assume the form is type- and name-correct. */
 
 
-// Semantic domain for expressions (values)
+/* Semantic domain for expressions (values) */
 data Value
   = vint(int n)
   | vbool(bool b)
@@ -21,13 +21,14 @@ data Value
   | vunknown()
   ;
 
-// The value environment
+/* The value environment */
 alias VEnv = map[str name, Value \value];
 
-// Modeling user input
+/* Modeling user input */
 data Input
   = input(str question, Value \value);
 
+/* default value for every type */
 Value defaultValue(AType aType) {
   switch(aType.typeName) {
     case "integer": return vint(0);
@@ -38,19 +39,20 @@ Value defaultValue(AType aType) {
   }
 }
 
-// produce an environment which for each question has a default value
-// (e.g. 0 for int, "" for str etc.)
+/* produce an environment which for each question has a default value
+/  (e.g. 0 for int, "" for str etc.) */
 VEnv initialEnv(AForm f) {
   return (prompt.id.name : defaultValue(prompt.aType) | /question(str name, APrompt prompt) := f);
 }
 
+/* creates an input which can be used for evaluation */
 Input createInput(str question, Value \value){
   return input(question, \value);
 }
 
 
-// Because of out-of-order use and declaration of questions
-// we use the solve primitive in Rascal to find the fixpoint of venv.
+/* Because of out-of-order use and declaration of questions
+  we use the solve primitive in Rascal to find the fixpoint of venv. */
 VEnv eval(AForm f, Input inp, VEnv venv) {
   venv[inp.question] = inp.\value;
   return solve (venv) {
@@ -59,20 +61,23 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
 }
 
 VEnv evalOnce(AForm f, Input inp, VEnv venv) {
-  // Eval the questions
+  /* Eval the questions */
   for (AQuestion q <- f.questions ){
     venv = eval( q, inp, venv);
   }
   return venv;
 }
-
+/* 
+ * evaluate conditions for branching,
+ * evaluate inp and computed questions to return updated VEnv 
+ */
 VEnv eval(AQuestion q, Input inp, VEnv venv) {
-  // evaluate conditions for branching,
-  // evaluate inp and computed questions to return updated VEnv
   switch(q) {
+    /* regular question */
     case question(str name, APrompt prompt): {
       venv = eval(prompt, inp, venv);
     }
+    /* if statement */
     case question(AExpr expr,  list[AQuestion] questions, list[AElseStatement] elseStat): {
       for(AQuestion q <- questions) {
         venv = eval(q, inp, venv);
@@ -88,10 +93,13 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
   return venv; 
 }
 
+/*
+ * Gives value to id in prompt
+ */
 VEnv eval(APrompt prompt, Input inp, VEnv venv) {
-  
   switch(prompt) {
     case prompt(AId id, AType aType, list[AExpr] expressions): {
+      /* Changes value of id if there is an expression */
       for(AExpr e <- expressions) {
         venv[prompt.id.name] = eval(e, venv);
       }
@@ -100,8 +108,10 @@ VEnv eval(APrompt prompt, Input inp, VEnv venv) {
   return venv;
 }
 
+/* 
+ * Evaluate expression
+ */
 Value eval(AExpr e, VEnv venv){
-  
   switch(e){
     case expr(ATerm aterm):
       return eval(aterm, venv);
@@ -124,11 +134,13 @@ Value eval(AExpr e, VEnv venv){
 
 }
 
+/* 
+ * Evaluate binary operator
+ */
 Value eval(ABinaryOp bOp, VEnv venv){
-  
   switch (bOp) {
+    /* calculate int values */
     case mul(AExpr lhs, AExpr rhs):{
-      //println(vint(eval(lhs, venv).n * eval(rhs, venv).n));
       return vint(eval(lhs, venv).n * eval(rhs, venv).n);
     }
     case div(AExpr lhs,  AExpr rhs):{
@@ -138,10 +150,9 @@ Value eval(ABinaryOp bOp, VEnv venv){
       return vint(eval(lhs, venv).n + eval(rhs, venv).n);
     }
     case sub(AExpr lhs,  AExpr rhs):{
-      // println(venv["sellingPrice"]);
-      //println(vint(eval(lhs, venv).n - eval(rhs, venv).n));
       return vint(eval(lhs, venv).n - eval(rhs, venv).n);
     }
+    /* compare operators */
     case greth(AExpr lhs,  AExpr rhs):{
       return vbool(eval(lhs, venv).n > eval(rhs, venv).n);
     } 
@@ -203,12 +214,16 @@ Value eval(ABinaryOp bOp, VEnv venv){
   return vunknown(); 
 }
 
-
+/*
+ * Evaluate term
+ */
 Value eval(ATerm t, VEnv venv){
   switch (t) {
+    /* return value that is in virtual environment */
     case term(id(str name)): {
       return venv[name];
     } 
+    /* return literal values in their respective type */
     case termInt(str integer): {
       return vint(toInt(integer));
     }

@@ -6,6 +6,7 @@ import Message; // see standard library
 
 import IO;
 
+/* All types including terror() which is used for error checking */
 data Type
   = tint()
   | tbool()
@@ -14,9 +15,10 @@ data Type
   | terror()
   ;
 
-// the type environment consisting of defined questions in the form 
+/* the type environment consisting of defined questions in the form */
 alias TEnv = rel[loc def, str name, str label, Type \type];
 
+/* Converts an AType to a Type which can be used in TEnv */
 Type Atype2Type(AType aType) {
   switch(aType.typeName) {
     case "integer": return tint();
@@ -27,11 +29,10 @@ Type Atype2Type(AType aType) {
   }
 }
 
-// To avoid recursively traversing the form, use the `visit` construct
-// or deep match (e.g., `for (/question(...) := f) {...}` ) 
-// Only defintion so no if-guards
-// x.Aprompt.id, type converten, check contruuctor
-// tenv> label is de vraag, and the name is de id dit gebruikt wordt
+/*
+ * To avoid recursively traversing the form, use the `visit` construct
+ * or deep match (e.g., `for (/question(...) := f) {...}` ) 
+ */
 TEnv collect(AForm f) {
   return{< prompt.id.src, prompt.id.name, name, Atype2Type(prompt.aType) > | /question(str name, APrompt prompt) := f};
 }
@@ -39,7 +40,10 @@ TEnv collect(AForm f) {
 set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
 
-  // Check the questions
+  /* 
+   * Loop through all questions
+   * add error/warning message per question if applicable
+   */
   for (AQuestion q <- f.questions ){
     msgs += check( q ,tenv, useDef);
   }
@@ -47,32 +51,32 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
   return msgs; 
 }
 
-// - produce an error if there are declared questions with the same name but different types.
-// - duplicate labels should trigger a warning 
-// - the declared type computed questions should match the type of the expression.
+/*
+ * - produce an error if there are declared questions with the same name but different types.
+ * - duplicate labels should trigger a warning 
+ * - the declared type computed questions should match the type of the expression.
+ */
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
 
   switch(q){
+    /* Regular question */
     case question(str name, APrompt prompt): {
-
-        // Warning: duplicate labels
+        /* Warning: duplicate labels */
         msgs += {warning("Duplicate label", q.src) | <loc d, _, name, _> <- tenv, <loc d2, _, name, _> <- tenv, d != d2};
-        // Error: there are declared questions with the same name but different types.
+        /* Error: there are declared questions with the same name but different types. */
         msgs += {error("Duplicate label TTTTTT", q.src) | <loc d, _, name, _> <- tenv, <loc d2, _, name, _> <- tenv, d != d2, <_, _, name, Type t> <- tenv, <_, _, name, Type t2> <- tenv, t != t2};
         
-        //Check prompt
+        /* Check prompt */
         msgs += check(prompt, tenv, useDef);
-        
-        //declare type question (name) should match = expression
-
     }
-
+    /* If statement */
     case question(AExpr expr,  list[AQuestion] questions, list[AElseStatement] elseStat): {
       msgs += {error("Guard is not valid", q.src) | !checkGuard(expr, tenv, useDef) };
       for(AQuestion q <- questions) {
         msgs += check(q, tenv, useDef);
       }
+      /* Loop through all questions from the else statement if there is one */
       for(AElseStatement els <- elseStat) {
         for(AQuestion q <- els.questions) {
           msgs += check(q, tenv, useDef);
@@ -274,7 +278,7 @@ Type typeOf(ABinaryOp bOp, TEnv tenv, UseDef useDef) {
   return tunknown(); 
 } 
 
-Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
+Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {pe typeOf(AExpr e, TEnv tenv, UseDef useDef) {
   switch (e) {
     case expr(ATerm aterm):  
       return typeOf(aterm, tenv, useDef);

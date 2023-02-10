@@ -26,25 +26,21 @@ AForm cst2ast(start[Form] sf) {
   }
 }
 
-
+/* 
+ * Divides questions in regular questions and if statements
+ */
 AQuestion cst2ast(Question q) {
   switch (q){
     case (Question)`<StrLiteral nameQ><Prompt promptQ>`: return question("<nameQ>", cst2ast(promptQ),src=q.src);
     case (Question)`if ( <Expr guard> ) { <Question* questions> } <ElseStatement? elseStat>`: return question(cst2ast(guard), [cst2ast(q) | Question q <- questions], [cst2ast(els) | ElseStatement els <- elseStat], src=q.src);
   
-
     default: throw "Unhandled question: <q>";
   }
 }
 
-AElseStatement cst2ast(ElseStatement e){
-  switch(e){
-    case(ElseStatement)`else { <Question* qs> }` : return elseStat([cst2ast(q) | Question q <- qs], src = e.src);
-
-    default: throw "Unhandled else statement: <e>";
-  }
-}
-
+/*
+ * Convert prompt into AST
+ */
 APrompt cst2ast(Prompt p){
   switch(p){
     case (Prompt)`<Id x> : <Type t>`: 
@@ -56,6 +52,9 @@ APrompt cst2ast(Prompt p){
   }
 }
 
+/*
+ * Convert expression into AST
+ */
 AExpr cst2ast(Expr e) {
   switch (e) {
     case (Expr)`<Term x>`: return expr(cst2ast(x), src=e.src);
@@ -69,6 +68,9 @@ AExpr cst2ast(Expr e) {
   }
 }
 
+/*
+ * Convert binary operator into AST
+ */
 ABinaryOp cst2ast(BinaryOp b) {
   switch(b) {
     case (BinaryOp)`<Expr left> * <Expr right>`: return mul(cst2ast(left), cst2ast(right), src=b.src);
@@ -88,6 +90,9 @@ ABinaryOp cst2ast(BinaryOp b) {
   }
 }
 
+/*
+ * Convert type into AST
+ */
 AType cst2ast(Type t) {
   switch(t){
     case(Type)`<Str strType>`: return atype("<strType>", src=t.src);
@@ -98,7 +103,9 @@ AType cst2ast(Type t) {
   }
 }
 
-
+/*
+ * Convert term into AST
+ */
 ATerm cst2ast(Term t){
   switch(t){
     case(Term)`<Id x>`: return term(id("<x>", src=x.src), src = t.src); 
@@ -111,6 +118,9 @@ ATerm cst2ast(Term t){
 
 }
 
+/*
+ * Convert else statement into AST
+ */
 AElseStatement cst2ast(ElseStatement e) {
   switch(e) {
     case(ElseStatement)`else { <Question* questions> }`: return elseStat([cst2ast(q) | Question q <- questions], src=e.src);
