@@ -46,14 +46,14 @@ The class that checks the questionnaires QL on the following:
 3. The declared type computed questions should match the type of the expression.
 
 ### Eval
-The class that updates the values of the Value Environment of a questionnaire.
+The class that evaluates the values of the Value Environment of a questionnaire.
 
 
 ### Compile
 The class that compiles the questionnaire to an HTML file and it’s corresponding JavaScript file, that handles the actions of the HTML script.
 
-It was recommended to use a checkbox for the Boolean prompts (questions), but instead 
-we used a select box, where the user can choose `Yes`, `No` or `-` (default).
+It was recommended to use a checkbox for the Boolean prompts (questions), however
+we decided to use a select box which we also saw in a given example. We preferred this look and it also gave an easy implementation of a default value. The user can choose `Yes`, `No` or `-` (default).
 Therefore the if or else statement does not pop up immediately. For that the happen the user should click on the `Submit (form name)` button. 
 
 The `Submit (form name)` button executes the function refresh() implemented in the JavaScript file, which preform the functions setValues() and  popUpExpression() , which updates the values of the prompts and  showing the sections with the question of the if or else statements respectively.
