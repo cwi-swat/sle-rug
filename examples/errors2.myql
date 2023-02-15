@@ -1,0 +1,36 @@
+form errorExample { 
+  "Did you buy a house in 2010?"
+    hasBoughtHouse: boolean
+
+  "Did you enter a loan?"
+    hasMaintLoan: boolean
+
+  "test label"
+    test: integer = (3 && true) + 1  
+    
+  "Did you enter a loan?"
+    hasMaintLoan2: boolean
+    
+  "Did you sell a house in 2010?"
+    hasSoldHouse: string
+
+  "Did you sell a house in 2010?"
+    hasSoldHouse: string
+    
+  if (hasSoldHouse) {
+    "What was the selling price?"
+      sell: boolean
+    "Private debts for the sold house:"
+      privateDebt: integer = true
+    "Value residue:"
+      valueResidue: integer = sellingPrice + 1
+  }
+
+  "Can you AND an int with a boolean?"
+    int_and_bool: integer = (3 && true) + 1
+
+  if (undefined_variable) {}
+
+  "Can you ask for the same variable with different question text?"
+    hasBoughtHouse: string
+}

@@ -3,44 +3,72 @@ module Transform
 import Syntax;
 import Resolve;
 import AST;
+import CST2AST;
+import ParseTree;
+import IO;
 
 /* 
  * Transforming QL forms
  */
  
  
-/* Normalization:
- *  wrt to the semantics of QL the following
- *     q0: "" int; 
- *     if (a) { 
- *        if (b) { 
- *          q1: "" int; 
- *        } 
- *        q2: "" int; 
- *      }
- *
- *  is equivalent to
- *     if (true) q0: "" int;
- *     if (true && a && b) q1: "" int;
- *     if (true && a) q2: "" int;
- *
- * Write a transformation that performs this flattening transformation.
- *
- */
- 
 AForm flatten(AForm f) {
-  return f; 
+  list[AQuestion] questions = [];
+
+  questions += flatten(f.questions, ref(boolean("true")));
+
+  return form(f.name, questions);
 }
 
-/* Rename refactoring:
- *
- * Write a refactoring transformation that consistently renames all occurrences of the same name.
- * Use the results of name resolution to find the equivalence class of a name.
- *
- */
+list[AQuestion] flatten(list[AQuestion] questions, AExpr e) {
+  list[AQuestion] result = [];
+
+  for (AQuestion question <- questions) {
+        println(e);
+    switch (question) {
+      case question(_,_,_):
+        result += ifQuestions(e, [question]);
+      case question(_,_,_,_):
+        result += ifQuestions(e, [question]);
+      case ifQuestions(AExpr expr, list[AQuestion] questions):
+      {
+        println(questions);
+        result += flatten(questions, logicAnd(e, expr));
+      }
+      case ifElseQuestions(expr, questions1, questions2):
+      {
+        result += flatten(questions1, logicAnd(e, expr));
+        result += flatten(questions2, logicAnd(e, not(expr)));
+      }
+    }
+  }
+
+  return result;
+}
+
  
-start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
-   return f; 
+start[Form] rename(start[Form] f, loc name, str newName, UseDef useDef) {
+
+  RefGraph refgraph = resolve(cst2ast(f));
+
+  set[loc] toRename = {};
+
+  if (name in refgraph.defs<1>) {
+    toRename += {name};
+    toRename += { u | <loc u, name> <- refgraph.useDef};
+  }
+  else if (name in refgraph.uses<0>) {
+    if (<name, loc d> <- refgraph.useDef) {
+      toRename += {d};
+      toRename += {u | <loc u, d> <- refgraph.useDef};
+    }
+  } else {
+    return f;
+  }
+
+  return visit (f) {
+    case Id variable => [Id]newName when variable@\loc in toRename
+  };
 } 
  
  

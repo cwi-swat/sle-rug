@@ -1,0 +1,57 @@
+form test {
+     "Is the number between 1 and 10" x_1_10: boolean
+  if (x_1_10) { 
+    "Is the number between 1 and 5" x_1_5: boolean
+    if (x_1_5) { 
+      "Is the number between 1 and 3" x_1_3: boolean
+      if (x_1_3) { 
+        "Is the number between 1 and 2" x_1_2: boolean
+        if (x_1_2) { 
+          "The answer is" answer_1_2: integer = (1)
+        }
+        else { 
+          "The answer is" answer_2_3: integer = (2)
+        }
+      }
+      else { 
+        "Is the number between 3 and 4" x_3_4: boolean
+        if (x_3_4) { 
+          "The answer is" answer_3_4: integer = (3)
+        }
+        else { 
+          "The answer is" answer_4_5: integer = (4)
+        }
+      }
+    }
+    else { 
+      "Is the number between 5 and 7" x_5_7: boolean
+      if (x_5_7) { 
+        "Is the number between 5 and 6" x_5_6: boolean
+        if (x_5_6) { 
+          "The answer is" answer_5_6: integer = (5)
+        }
+        else { 
+          "The answer is" answer_6_7: integer = (6)
+        }
+      }
+      else { 
+        "Is the number between 7 and 8" x_7_8: boolean
+        if (x_7_8) { 
+          "The answer is" answer_7_8: integer = (7)
+        }
+        else { 
+          "Is the number between 8 and 9" x_8_9: boolean
+          if (x_8_9) { 
+            "The answer is" answer_8_9: integer = (8)
+          }
+          else { 
+            "The answer is" answer_9_10: integer = (9)
+          }
+        }
+      }
+    }
+  } 
+  else {
+    "Is the number between 10 and 15" x_10_15: boolean
+  }
+}

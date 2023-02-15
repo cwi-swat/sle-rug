@@ -26,9 +26,10 @@ RefGraph resolve(AForm f) = <us, ds, us o ds>
   when Use us := uses(f), Def ds := defs(f);
 
 Use uses(AForm f) {
-  return {}; 
+  return {<x.src, x.name> | /ref(AId x) := f};
 }
 
+// computed questions
 Def defs(AForm f) {
-  return {}; 
+  return {<x.name, x.src> | /question(_, AId x, _) := f};
 }
